@@ -1,0 +1,20 @@
+# STM32CubeIDE/Eclipse workspace settings
+.metadata/*
+**/.settings/**
+*.launch
+*.log
+
+# Build artifacts
+**/Debug/
+**/Release/
+**/.vscode/**
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+
+# Backup and autosave files
+*~
+*.swp
