@@ -1,0 +1,25 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install ARM toolchain
+      run: |
+        sudo apt update
+        sudo apt install -y gcc-arm-none-eabi
+
+    - name: Build
+      run: |
+        find . -name '*.cpp' > sources.txt
+        arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -std=c++20 -c @sources.txt
