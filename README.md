@@ -1,4 +1,4 @@
-# Aikartos
+# AikaRTOS
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Made for STM32](https://img.shields.io/badge/Platform-STM32-blue.svg)](#)
