@@ -12,6 +12,13 @@ The project is written in **C++20**.
 > It was developed using a NUCLEO-F411RE board for experimentation purposes.  
 > Compatibility with other devices has not been tested.
 
+## Table of Contents
+- [Features](#features)
+- [Tests](#tests)
+- [License](#license)
+- [Getting Started](#getting-started)
+- [Build Requirements](#build-requirements)
+
 ---
 
 ## Features
@@ -22,15 +29,16 @@ The project is written in **C++20**.
 - Designed for STM32 Cortex-M4 MCUs
 - Written in C++20
 
----
-
-## Tests
-
-The `src/tests/` directory contains example projects demonstrating the usage of different schedulers.
-
 | Example                  | Description                                                                 |
 |--------------------------|-----------------------------------------------------------------------------|
 | `round_robin.cpp`        | Demonstrates basic Round-Robin task switching between three simple infinite loops. |
+| `edf.cpp`                | Demonstrates Earliest Deadline First (EDF) scheduling with tasks having different deadlines. |
+| `fixed_priority.cpp`     | Demonstrates Fixed Priority scheduling where tasks are executed based on static priorities. |
+| `lottery.cpp`            | Demonstrates Lottery Scheduling where tasks are chosen randomly based on ticket allocation. |
+| `priority_aging.cpp`     | Demonstrates Priority Scheduling with Aging to prevent starvation of low-priority tasks. |
+| `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
+| `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
+
 | `edf.cpp`                | Demonstrates Earliest Deadline First (EDF) scheduling with tasks having different deadlines. |
 | `fixed_priority.cpp`     | Demonstrates Fixed Priority scheduling where tasks are executed based on static priorities. |
 | `lottery.cpp`            | Demonstrates Lottery Scheduling where tasks are chosen randomly based on ticket allocation. |
@@ -46,6 +54,19 @@ The `src/tests/` directory contains example projects demonstrating the usage of 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
+
+## Build Requirements
+
+To build and run this project, you will need:
+
+- **ARM toolchain** (e.g., `arm-none-eabi-gcc`)
+- **STM32Cube Firmware Package for STM32F4**  
+  This includes the necessary device headers like `<stm32f4xx.h>` and HAL/LL drivers.  
+  You can download it via:
+  - [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html)
+  - [STM32CubeF4 Package](https://www.st.com/en/embedded-software/stm32cubef4.html)
+
+> Make sure the firmware package is correctly installed and accessible to your build system or IDE.
 
 ## Getting Started
 
