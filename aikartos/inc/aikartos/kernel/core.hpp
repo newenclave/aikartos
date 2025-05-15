@@ -65,7 +65,7 @@ namespace aikartos::kernel {
 					| SysTick_CTRL_TICKINT_Msk
 					| SysTick_CTRL_ENABLE_Msk);
 
-			quanta_ = quanta;
+			impl_base::quanta_ = quanta;
 			kernel_launch_impl();
 		}
 
@@ -78,7 +78,7 @@ namespace aikartos::kernel {
 		}
 
 		static std::uint32_t get_quanta() {
-			return quanta_;
+			return impl_base::quanta_;
 		}
 
 		static void set_scheduler_event_handler (sch::events::handler_type cb) {
@@ -93,8 +93,6 @@ namespace aikartos::kernel {
 	private:
 
 		friend struct handlers_friend;
-
-		inline static std::uint32_t quanta_ = 0;
 		inline static volatile std::uint32_t tick_count_ = 0;
 		inline static impl_base *instance_ = nullptr;
 	};

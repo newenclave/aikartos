@@ -16,6 +16,7 @@
 #include "aikartos/utils/object_pool.hpp"
 
 #include "aikartos/kernel/api.hpp"
+#include "aikartos/kernel/core.hpp"
 
 namespace aikartos::kernel {
 
@@ -40,6 +41,9 @@ namespace aikartos::kernel {
 				sync::irq_critical_section dirq;
 				pool_.free(utils::container_of<task_object>(object, &task_object::tcb));
 			}
+			static void on_quanta_change(std::uint32_t quanta) {
+				kernel::impl_base::quanta_ = quanta;
+			};
 		};
 	public:
 

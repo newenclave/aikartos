@@ -16,9 +16,15 @@ namespace aikartos::kernel {
 			kernel::core::tick_count_ += 1;
 			static std::uint32_t counter = 0;
 			static std::uint32_t quanta = core::get_quanta();
-			if(++counter == quanta) {
+			std::uint32_t current_quanta = core::get_quanta();
+
+			if(current_quanta != quanta) {
+				quanta = current_quanta;
 				counter = 0;
-				//quanta = core::get_quanta();
+			}
+
+			if((0 != quanta) && (++counter >= quanta)) {
+				counter = 0;
 				SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 			}
 		}

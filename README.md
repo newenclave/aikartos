@@ -1,5 +1,9 @@
 # AikaRTOS
 
+<p align="center">
+  <img src="aikartos_logo.svg" alt="AikaRTOS Logo" width="200"/>
+</p>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Made for STM32](https://img.shields.io/badge/Platform-STM32-blue.svg)](#)
 [![Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-orange)](#)

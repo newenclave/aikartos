@@ -18,6 +18,7 @@ namespace tests {
 	int fixed_priority();
 	int priority_aging();
 	int stack_overflow();
+	int coop_preemptive();
 }
 
 extern std::uint32_t count[tests::COUNT_SIZE];

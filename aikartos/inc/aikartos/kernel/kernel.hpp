@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "aikartos/kernel/api.hpp"
 #include "aikartos/kernel/core.hpp"
+#include "aikartos/kernel/api.hpp"
 
 namespace aikartos::kernel {
 

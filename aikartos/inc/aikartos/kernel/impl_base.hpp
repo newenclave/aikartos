@@ -15,6 +15,8 @@
 #include "aikartos/tasks/object.hpp"
 
 namespace aikartos::kernel {
+
+	class core;
 	class impl_base {
 	public:
 
@@ -27,5 +29,8 @@ namespace aikartos::kernel {
 		virtual std::tuple<control_block *, sch::scheduler_specific_event> get_next_task() = 0;
 
 		sch::events::handler_type set_scheduler_event_handler_ = nullptr;
+	protected:
+		friend class kernel::core;
+		inline static std::uint32_t quanta_ = 0;
 	};
 }
