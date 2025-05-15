@@ -37,7 +37,7 @@ The project is written in **C++20**.
 
 ## Examples 
 
-> All examples can be found in the "aikartos/src/tests" folder.
+> All examples can be found in the `aikartos/src/tests` folder.
 
 
 | Example                  | Description                                                                 |
@@ -50,6 +50,7 @@ The project is written in **C++20**.
 | `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
 | `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
 | `producer_consumer.cpp`  | Demonstrates a simple Producer-Consumer system using a shared lock-free queue and cooperative task switching. |
+| `coop_preemptive.cpp`	   | Demonstrates hybrid Cooperative-Preemptive scheduling where each task can have its own quantum or run cooperatively. |
 
 ---
 
