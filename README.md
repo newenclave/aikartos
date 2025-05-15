@@ -18,7 +18,7 @@ The project is written in **C++20**.
 
 ## Table of Contents
 - [Features](#features)
-- [Tests](#tests)
+- [Examples](#examples)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
