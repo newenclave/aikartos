@@ -39,13 +39,6 @@ The project is written in **C++20**.
 | `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
 | `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
 
-| `edf.cpp`                | Demonstrates Earliest Deadline First (EDF) scheduling with tasks having different deadlines. |
-| `fixed_priority.cpp`     | Demonstrates Fixed Priority scheduling where tasks are executed based on static priorities. |
-| `lottery.cpp`            | Demonstrates Lottery Scheduling where tasks are chosen randomly based on ticket allocation. |
-| `priority_aging.cpp`     | Demonstrates Priority Scheduling with Aging to prevent starvation of low-priority tasks. |
-| `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
-| `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
-
 
 ---
 
