@@ -26,7 +26,7 @@ The project is written in **C++20**.
 
 ## Tests
 
-The `Src/tests/` directory contains example projects demonstrating the usage of different schedulers.
+The `src/tests/` directory contains example projects demonstrating the usage of different schedulers.
 
 | Example               | Description                                    |
 |------------------------|------------------------------------------------|
