@@ -105,18 +105,6 @@ namespace aikartos::kernel {
 			kernel::api::yield();
 		}
 
-		static void periodic_task_wrapper() {
-			auto tcb = kernel::api::get_current_tcb();
-			ASSERT(tcb, "No current TCB...");
-			while(1) {
-				if(tcb->task.task) {
-					tcb->task.state = tasks::descriptor::state_type::RUNNING;
-					tcb->task.task(tcb->task.parameter);
-				}
-				api::sleep_task_for(tcb, tcb->task.timing.period_ms);
-			}
-		}
-
 		void task_object_staсk_init(control_block &tcb, int32_t task) {
 
 			tcb.push(xPSR_T_Msk); // 0x01000000
