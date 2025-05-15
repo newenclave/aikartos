@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "aikartos/const/constants.hpp"
+#include "aikartos/device/timebase.hpp"
 #include "aikartos/kernel/api.hpp"
 #include "aikartos/kernel/config.hpp"
 #include "aikartos/kernel/impl.hpp"
@@ -50,20 +51,12 @@ namespace aikartos::kernel {
 		}
 
 		static void launch(std::uint32_t quanta) {
-			constexpr std::uint32_t count_in_millisecond = constants::system_clock_frequency / 1'000;
-			SysTick->CTRL = 0;
-			SysTick->VAL  = 0;
-			SysTick->LOAD = count_in_millisecond - 1;
+
+			// SysTick higher priority
+			device::timebase::systick_init(1'000, 8);
 
 			//PendSV lower priority
 			NVIC_SetPriority(PendSV_IRQn, 15);
-
-			//SysTick higher priority
-			NVIC_SetPriority(SysTick_IRQn, 8);
-
-			SysTick->CTRL |= (SysTick_CTRL_CLKSOURCE_Msk
-					| SysTick_CTRL_TICKINT_Msk
-					| SysTick_CTRL_ENABLE_Msk);
 
 			impl_base::quanta_ = quanta;
 			kernel_launch_impl();

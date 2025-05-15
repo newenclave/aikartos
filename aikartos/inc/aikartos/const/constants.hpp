@@ -11,5 +11,6 @@
 
 namespace aikartos::constants {
 	constexpr std::uint32_t system_clock_frequency = 16'000'000u;
+	constexpr std::uint32_t default_baud_rate = 115'200u;
 	constexpr std::uint32_t quanta_infinite = 0xFFFF'FFFF; // No forced preemption (cooperative task)
 }

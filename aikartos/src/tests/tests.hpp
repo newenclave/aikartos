@@ -19,6 +19,8 @@ namespace tests {
 	int priority_aging();
 	int stack_overflow();
 	int coop_preemptive();
+	int uart_blocking_write();
+	int producer_consumer();
 }
 
 extern std::uint32_t count[tests::COUNT_SIZE];

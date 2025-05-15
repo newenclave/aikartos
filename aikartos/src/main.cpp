@@ -4,5 +4,5 @@
 std::uint32_t count[tests::COUNT_SIZE] = {};
 
 int main() {
-	return tests::coop_preemptive();
+	return tests::produser_consumer();
 }

@@ -42,7 +42,7 @@ The project is written in **C++20**.
 | `priority_aging.cpp`     | Demonstrates Priority Scheduling with Aging to prevent starvation of low-priority tasks. |
 | `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
 | `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
-
+| `producer_consumer.cpp`  | Demonstrates a simple Producer-Consumer system using a shared lock-free queue and cooperative task switching. |
 
 ---
 

@@ -7,8 +7,6 @@
  */
 
 
-
-
 #include "aikartos/kernel/config.hpp"
 #include "aikartos/kernel/kernel.hpp"
 #include "aikartos/kernel/panic.hpp"
