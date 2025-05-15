@@ -20,11 +20,10 @@ namespace aikartos::rnd {
 		std::uint32_t next() {
 			/* Algorithm "xor128" from p. 5 of Marsaglia, "Xorshift RNGs" */
 			std::uint32_t t  = state_[3];
-
 			std::uint32_t s  = state_[0];  /* Perform a contrived 32-bit shift. */
-		    state_[3] = state_[2];
-		    state_[2] = state_[1];
-		    state_[1] = s;
+			state_[3] = state_[2];
+			state_[2] = state_[1];
+			state_[1] = s;
 
 			t ^= t << 11;
 			t ^= t >> 8;
