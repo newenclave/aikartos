@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  
+  <rect x="48" y="48" width="160" height="160" rx="16" ry="16" fill="none" stroke="#FFFFFF" stroke-width="12"/>
+  <circle cx="128" cy="128" r="48" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+
+  <!-- Clock hands -->
+  <line x1="128" y1="128" x2="128" y2="88" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  <line x1="128" y1="128" x2="156" y2="128" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Chip pins (lines) -->
+  <line x1="10" y1="80" x2="48" y2="80" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="10" y1="128" x2="48" y2="128" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="10" y1="176" x2="48" y2="176" stroke="#FFFFFF" stroke-width="8"/>
+
+  <line x1="208" y1="80" x2="246" y2="80" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="208" y1="128" x2="246" y2="128" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="208" y1="176" x2="246" y2="176" stroke="#FFFFFF" stroke-width="8"/>
+
+  <line x1="80" y1="10" x2="80" y2="48" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="128" y1="10" x2="128" y2="48" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="176" y1="10" x2="176" y2="48" stroke="#FFFFFF" stroke-width="8"/>
+
+  <line x1="80" y1="208" x2="80" y2="246" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="128" y1="208" x2="128" y2="246" stroke="#FFFFFF" stroke-width="8"/>
+  <line x1="176" y1="208" x2="176" y2="246" stroke="#FFFFFF" stroke-width="8"/>
+
+  <!-- blue body -->
+  <line x1="128" y1="128" x2="128" y2="88" stroke="#00337F" stroke-width="6" stroke-linecap="round"/>
+  <line x1="128" y1="128" x2="156" y2="128" stroke="#00337F" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Chip pins (circles) -->
+  <circle cx="10" cy="80" r="10" fill="#FFFFFF"/>
+  <circle cx="10" cy="128" r="10" fill="#FFFFFF"/>
+  <circle cx="10" cy="176" r="10" fill="#FFFFFF"/>
+
+  <circle cx="246" cy="80" r="10" fill="#FFFFFF"/>
+  <circle cx="246" cy="128" r="10" fill="#FFFFFF"/>
+  <circle cx="246" cy="176" r="10" fill="#FFFFFF"/>
+
+  <circle cx="80" cy="10" r="10" fill="#FFFFFF"/>
+  <circle cx="128" cy="10" r="10" fill="#FFFFFF"/>
+  <circle cx="176" cy="10" r="10" fill="#FFFFFF"/>
+
+  <circle cx="80" cy="246" r="10" fill="#FFFFFF"/>
+  <circle cx="128" cy="246" r="10" fill="#FFFFFF"/>
+  <circle cx="176" cy="246" r="10" fill="#FFFFFF"/>
+
+
+  <!-- Chip pins (lines) -->
+  <line x1="10" y1="80" x2="48" y2="80" stroke="#00337F" stroke-width="4"/>
+  <line x1="10" y1="128" x2="48" y2="128" stroke="#00337F" stroke-width="4"/>
+  <line x1="10" y1="176" x2="48" y2="176" stroke="#00337F" stroke-width="4"/>
+
+  <line x1="208" y1="80" x2="246" y2="80" stroke="#00337F" stroke-width="4"/>
+  <line x1="208" y1="128" x2="246" y2="128" stroke="#00337F" stroke-width="4"/>
+  <line x1="208" y1="176" x2="246" y2="176" stroke="#00337F" stroke-width="4"/>
+
+  <line x1="80" y1="10" x2="80" y2="48" stroke="#00337F" stroke-width="4"/>
+  <line x1="128" y1="10" x2="128" y2="48" stroke="#00337F" stroke-width="4"/>
+  <line x1="176" y1="10" x2="176" y2="48" stroke="#00337F" stroke-width="4"/>
+
+  <line x1="80" y1="208" x2="80" y2="246" stroke="#00337F" stroke-width="4"/>
+  <line x1="128" y1="208" x2="128" y2="246" stroke="#00337F" stroke-width="4"/>
+  <line x1="176" y1="208" x2="176" y2="246" stroke="#00337F" stroke-width="4"/>
+
+
+  <!-- Chip square -->
+  <rect x="48" y="48" width="160" height="160" rx="16" ry="16" fill="none" stroke="#00337F" stroke-width="8"/>
+  
+  <!-- Clock circle -->
+  <circle cx="128" cy="128" r="48" fill="none" stroke="#00337F" stroke-width="6"/>
+
+  <circle cx="10" cy="80" r="6" fill="#00337F"/>
+  <circle cx="10" cy="128" r="6" fill="#00337F"/>
+  <circle cx="10" cy="176" r="6" fill="#00337F"/>
+
+  <circle cx="246" cy="80" r="6" fill="#00337F"/>
+  <circle cx="246" cy="128" r="6" fill="#00337F"/>
+  <circle cx="246" cy="176" r="6" fill="#00337F"/>
+
+  <circle cx="80" cy="10" r="6" fill="#00337F"/>
+  <circle cx="128" cy="10" r="6" fill="#00337F"/>
+  <circle cx="176" cy="10" r="6" fill="#00337F"/>
+
+  <circle cx="80" cy="246" r="6" fill="#00337F"/>
+  <circle cx="128" cy="246" r="6" fill="#00337F"/>
+  <circle cx="176" cy="246" r="6" fill="#00337F"/>
+
+</svg>
