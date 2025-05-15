@@ -55,11 +55,11 @@ namespace aikartos::kernel {
 			SysTick->VAL  = 0;
 			SysTick->LOAD = count_in_millisecond - 1;
 
-		    //PendSV lower priority
-		    NVIC_SetPriority(PendSV_IRQn, 15);
+			//PendSV lower priority
+			NVIC_SetPriority(PendSV_IRQn, 15);
 
-		    //SysTick higher priority
-		    NVIC_SetPriority(SysTick_IRQn, 8);
+			//SysTick higher priority
+			NVIC_SetPriority(SysTick_IRQn, 8);
 
 			SysTick->CTRL |= (SysTick_CTRL_CLKSOURCE_Msk
 					| SysTick_CTRL_TICKINT_Msk
