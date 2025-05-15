@@ -33,6 +33,13 @@ The project is written in **C++20**.
 - Designed for STM32 Cortex-M4 MCUs
 - Written in C++20
 
+---
+
+## Examples 
+
+> All examples can be found in the "aikartos/src/tests" folder.
+
+
 | Example                  | Description                                                                 |
 |--------------------------|-----------------------------------------------------------------------------|
 | `round_robin.cpp`        | Demonstrates basic Round-Robin task switching between three simple infinite loops. |
