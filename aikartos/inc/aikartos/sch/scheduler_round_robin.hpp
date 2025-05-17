@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <tuple>
+
 #include "aikartos/kernel/core.hpp"
 #include "aikartos/sch/events.hpp"
 #include "aikartos/sch/waiting_tasks_queue.hpp"
@@ -15,7 +17,6 @@
 #include "aikartos/sync/priority_queue.hpp"
 #include "aikartos/tasks/config.hpp"
 #include "aikartos/tasks/object.hpp"
-#include <tuple>
 #include "aikartos/sync/circular_queue.hpp"
 
 namespace aikartos::sch {

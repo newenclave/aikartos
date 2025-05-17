@@ -20,7 +20,7 @@
 
 namespace aikartos::sync {
 	template <typename T,
-		std::size_t QueueSize = 8,
+		std::size_t QueueSize,
 		typename LessT = std::less<T>, sync::policies::MutexPolicy MutexType = sync::spin_lock<>>
 		requires (std::default_initializable<T> && std::copyable<T>)
 	class stable_priority_queue {
@@ -40,6 +40,14 @@ namespace aikartos::sync {
 			return true;
 		}
 
+		std::optional<element_type> peek() {
+			std::lock_guard<mutex_type> l(lock_);
+			if (count_ == 0) {
+				return {};
+			}
+			return { items_[0].value };
+		}
+
 		std::optional<element_type> try_pop() {
 			std::lock_guard<mutex_type> l(lock_);
 			if (count_ == 0) {
@@ -51,6 +59,13 @@ namespace aikartos::sync {
 				index_ = 0;
 			}
 			return { value };
+		}
+
+		template <typename CallBackT>
+		inline void foreach(CallBackT cb) {
+			for(std::size_t i = 0; i < count_; ++i) {
+				cb(items_[i].value);
+			}
 		}
 
 	private:

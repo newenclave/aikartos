@@ -17,7 +17,7 @@ using namespace aikartos;
 
 namespace {
 
-	constexpr static std::uint32_t THRESHOLD = 100'000'000;
+	constexpr static std::uint32_t THRESHOLD = 1'000'000;
 
 	void task0(void *)
 	{
@@ -48,14 +48,10 @@ namespace tests {
 		kernel::init<sch_ns::scheduler, config>();
 		using config_flags = sch_ns::config_flags;
 
-		config_flags cf;
-		(void)cf;
-
 		kernel::add_task(&task0, tasks::config{}.set<config_flags::priority>(2));
 		kernel::add_task(&task1, tasks::config{}.set<config_flags::priority>(1));
 		kernel::add_task(&task2, tasks::config{}.set<config_flags::priority>(0));
 
-	//	kernel::add_task(&task2, tasks::config{.priority = tasks::config::priority_class::LOW, .aging_threshold = 10});
 		kernel::launch(10);
 		PANIC("Should not be here");
 	}
