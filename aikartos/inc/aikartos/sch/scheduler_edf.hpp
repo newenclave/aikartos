@@ -1,5 +1,14 @@
-/*
- * edf.hpp
+/**
+ * @file scheduler_edf.hpp
+ * @brief Earliest Deadline First (EDF) scheduler for real-time task management.
+ *
+ * - Each task has an associated deadline configured at creation.
+ * - The scheduler always selects the READY task with the nearest (earliest) deadline.
+ * - Deadlines can be updated on task wake-up or manually via task configuration.
+ * - Ideal for systems with hard or soft real-time requirements where deadline order matters.
+ *
+ * This implementation ensures that time-critical tasks are executed in order of urgency,
+ * improving predictability in deadline-driven systems.
  *
  *  Created on: May 11, 2025
  *      Author: newenclave

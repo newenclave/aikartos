@@ -1,5 +1,13 @@
-/*
- * round_robin.hpp
+/**
+ * @file scheduler_round_robin.hpp
+ * @brief Basic Round-Robin scheduler that cycles through all READY tasks equally.
+ *
+ * - All tasks are treated equally, with no prioritization.
+ * - Tasks are scheduled in a circular fashion and get equal CPU time slices.
+ * - No fairness tracking or dynamic behavior — just simple, predictable switching.
+ *
+ * Ideal for early testing, cooperative systems, or evenly balanced workloads.
+ * Simple to implement and reason about.
  *
  *  Created on: May 6, 2025
  *      Author: newenclave

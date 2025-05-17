@@ -1,5 +1,13 @@
-/*
- * lottery.hpp
+/**
+ * @file scheduler_weighted_lottery.hpp
+ * @brief Weighted Lottery scheduler where task selection probability is based on configurable weights.
+ *
+ * - Each task is assigned a weight (number of tickets) at creation.
+ * - On each scheduling decision, a random draw selects one task, favoring those with higher weights.
+ * - Unlike basic lottery, weights here may be scaled or dynamically adjusted to influence scheduling behavior.
+ * - Provides probabilistic fairness with support for priority skewing through weight configuration.
+ *
+ * Useful when tasks have soft priority or importance levels and require non-deterministic, adaptive balancing.
  *
  *  Created on: May 11, 2025
  *      Author: newenclave
@@ -16,7 +24,6 @@
 #include "aikartos/tasks/config.hpp"
 #include "aikartos/tasks/control_block.hpp"
 #include <limits>
-
 
 namespace aikartos::sch {
 

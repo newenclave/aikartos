@@ -1,5 +1,13 @@
-/*
- * fixed_priority.hpp
+/**
+ * @file scheduler_fixed_priority.hpp
+ * @brief Fixed Priority scheduler where tasks are executed based on statically assigned priorities.
+ *
+ * - Each task is assigned a fixed priority at creation.
+ * - The scheduler always selects the READY task with the highest priority (lowest numerical value).
+ * - Tasks with equal priority are scheduled in the order they appear.
+ * - No dynamic reordering or fairness logic is applied — priority strictly dictates execution order.
+ *
+ * Simple and deterministic, this scheduler is suitable for systems where certain tasks must always preempt others.
  *
  *  Created on: May 6, 2025
  *      Author: newenclave

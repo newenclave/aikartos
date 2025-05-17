@@ -1,5 +1,11 @@
-/*
- * lottery.hpp
+/**
+ * @file scheduler_lottery.hpp
+ * @brief Lottery scheduler that randomly selects tasks based on ticket allocation.
+ *
+ * - Each task is assigned a number of "tickets" at creation.
+ * - On each scheduling decision, a random draw selects one task proportionally to its ticket count.
+ * - Tasks with more tickets have a higher probability of being selected.
+ * - Simple form of probabilistic fairness that supports dynamic balancing via ticket adjustment.
  *
  *  Created on: May 11, 2025
  *      Author: newenclave

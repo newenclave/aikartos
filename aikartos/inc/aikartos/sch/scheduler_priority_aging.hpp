@@ -1,5 +1,14 @@
-/*
- * priority_aging.hpp
+/**
+ * @file scheduler_priority_aging.hpp
+ * @brief Priority scheduler with aging to prevent starvation of low-priority tasks.
+ *
+ * - Each task has a base priority configured at creation.
+ * - Over time, waiting tasks have their effective priority increased ("aged").
+ * - The scheduler selects the READY task with the highest effective priority.
+ * - Once a task runs, its priority resets to the original base value.
+ *
+ * This approach retains deterministic priority-based execution,
+ * while ensuring that long-waiting tasks eventually get CPU time.
  *
  *  Created on: May 7, 2025
  *      Author: newenclave

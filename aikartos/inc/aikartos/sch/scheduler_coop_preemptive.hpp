@@ -1,5 +1,14 @@
-/*
- * scheduler_coop_preemptive.hpp
+/**
+ * @file scheduler_coop_preemptive.hpp
+ * @brief Hybrid scheduler combining cooperative and preemptive modes based on per-task quantum settings.
+ *
+ * - Each task has its own configurable time quantum.
+ * - Tasks with quantum > 0 are preempted automatically when the quantum expires.
+ * - Tasks with quantum == 0 are cooperative and run until they yield or block voluntarily.
+ * - The scheduler reads the active task’s quantum on every tick and resets the counter on context switch.
+ *
+ * This approach allows mixing real-time, cooperative tasks with preemptive ones, enabling precise control
+ * over CPU sharing and responsiveness.
  *
  *  Created on: May 15, 2025
  *      Author: newenclave
@@ -44,6 +53,7 @@ namespace aikartos::sch {
 			void configure_task(control_block *task, const tasks::config &cfg) {
 				auto *data = data_allocator_.alloc();
 				task->scheduler_data = static_cast<void *>(data);
+				data->quanta = kernel::core::get_default_quanta();
 				cfg.update_value<config_flags::quanta>(data->quanta);
 			}
 

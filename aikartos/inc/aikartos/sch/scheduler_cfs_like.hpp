@@ -1,8 +1,4 @@
 /*
- * scheduler_cfs_like.hpp
- *
- *  Created on: May 17, 2025
- *      Author: newenclave
  *
  * @file scheduler_cfs_like.hpp
  * @brief Fair scheduler based on accumulated virtual runtime (vruntime), inspired by the Linux CFS.
@@ -11,6 +7,11 @@
  * - On every context switch, the current task's vruntime is incremented based on its execution time.
  * - The scheduler always selects the task with the smallest vruntime to run next.
  * - Sleeping tasks do not accumulate vruntime and thus appear "poorer" when they return - gaining priority.
+ *
+ *
+ *  Created on: May 17, 2025
+ *      Author: newenclave
+ *
  *
  */
 

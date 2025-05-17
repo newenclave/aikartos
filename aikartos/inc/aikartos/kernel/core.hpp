@@ -59,6 +59,8 @@ namespace aikartos::kernel {
 			NVIC_SetPriority(PendSV_IRQn, 15);
 
 			impl_base::quanta_ = quanta;
+			impl_base::default_quanta_ = quanta;
+			get_first_task();
 			kernel_launch_impl();
 		}
 
@@ -74,6 +76,10 @@ namespace aikartos::kernel {
 			return impl_base::quanta_;
 		}
 
+		static std::uint32_t get_default_quanta() {
+			return impl_base::default_quanta_;
+		}
+
 		static void set_scheduler_event_handler (sch::events::handler_type cb) {
 			instance_->set_scheduler_event_handler_ = cb;
 		}
@@ -84,6 +90,8 @@ namespace aikartos::kernel {
 		static void add_task(task_entry task, const tasks::config &config, task_parameter parameter = nullptr);
 
 	private:
+
+		static void get_first_task();
 
 		friend struct handlers_friend;
 		inline static volatile std::uint32_t tick_count_ = 0;

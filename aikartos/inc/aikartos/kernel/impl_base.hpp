@@ -32,5 +32,6 @@ namespace aikartos::kernel {
 	protected:
 		friend class kernel::core;
 		inline static std::uint32_t quanta_ = 0;
+		inline static std::uint32_t default_quanta_ = 0;
 	};
 }

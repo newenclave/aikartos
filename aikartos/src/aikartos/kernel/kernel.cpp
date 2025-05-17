@@ -51,6 +51,10 @@ namespace aikartos::kernel {
 			g_current_tcb_ptr = added;
 		}
 	}
+	void core::get_first_task() {
+	    auto [next, _] = instance_->get_next_task();
+		g_current_tcb_ptr = next;
+	}
 	// core
 
 	/// kernel::api
