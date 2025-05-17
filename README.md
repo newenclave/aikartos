@@ -8,9 +8,9 @@
 [![Made for STM32](https://img.shields.io/badge/Platform-STM32-blue.svg)](#)
 [![Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-orange)](#)
 
-AikaRTOS is a simple educational RTOS project targeting the STM32 NUCLEO-F411RE board.  
-It is designed to explore basic task management and scheduling concepts on embedded systems.  
-The project is written in **C++20**.
+AikaRTOS is a simple educational RTOS project targeting the STM32 NUCLEO-F411RE board.
+It is designed to explore basic task management, task scheduling, and memory allocation on embedded systems.
+The project is written in C++20.
 
 > **Note:** This is a purely educational project.  
 > It was developed using a NUCLEO-F411RE board for experimentation purposes.  

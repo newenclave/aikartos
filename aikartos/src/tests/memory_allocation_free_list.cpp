@@ -38,41 +38,41 @@ namespace tests {
 		auto ptr1 = malloc(10);
 		printer("After ptr1 = alloc(10):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		auto ptr2 = malloc(1000);
 		printer("After ptr2 = alloc(100):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		auto ptr3 = malloc(555);
 		printer("After ptr3 = alloc(555):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		free(ptr1);
 		printer("After free(ptr1):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 		free(ptr2);
 		printer("After free(ptr2):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		auto ptr4 = malloc(50);
 		printer("After ptr4 = alloc(50):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		free(ptr3);
 		printer("After free(ptr3):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		free(ptr4);
 		printer("After free(ptr4):\r\n");
 		memory::get_allocator()->dump_info(printer);
-		printer(".....\r\n");
+		printer("\r\n\r\n");
 
 		while(1){}
 		PANIC("Should not be here");

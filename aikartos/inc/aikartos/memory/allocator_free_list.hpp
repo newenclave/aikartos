@@ -115,7 +115,7 @@ namespace aikartos::memory {
 			}
 		}
 
-		std::size_t total() override { return end_ptr - begin_ptr; }
+		std::size_t total() const override { return end_ptr - begin_ptr; }
 
 		std::size_t available() const {
 			std::size_t total = 0;
@@ -128,38 +128,33 @@ namespace aikartos::memory {
 			}
 			return total;
 		}
-#if 0
-		void draw_heap() const {
+
+		void dump_heap(printer_type printer) const override {
 			auto* curr = get_first_block();
-			std::cout << "Heap layout:\n";
+			printf("Heap layout:\r\n");
+
+			const auto scale_factor = total() / 64;
+
 			while (curr) {
 				std::size_t size = curr->size();
 				bool used = curr->is_used();
 
-				std::cout << "[";
-				std::size_t units = size / 16;
-				for (std::size_t i = 0; i < units; ++i) {
-					std::cout << (used ? '#' : '.');
+				printer("[");
+				std::size_t units = size / scale_factor;
+				if(units == 0) {
+					units = 1;
 				}
-				std::cout << "] ";
+				for (std::size_t i = 0; i < units; ++i) {
+					printer(used ? "#" : ".");
+				}
+				printer("] ");
+
 				curr = curr->next;
 			}
-			std::cout << "\n";
+			printer("\r\n");
 		}
 
-		void print_blocks() const {
-			auto* curr = get_first_block();
-			int i = 0;
-			while (curr) {
-				std::cout << "[" << i++ << "] used: " << curr->is_used()
-					<< ", size: " << curr->size()
-					<< ", addr: " << reinterpret_cast<void*>(curr) << "\n";
-				curr = curr->next;
-			}
-		}
-#endif
-
-		void dump_info(printer_type printer) override {
+		void dump_info(printer_type printer) const override {
 			auto* curr = get_first_block();
 			int i = 0;
 			while (curr) {
@@ -170,6 +165,7 @@ namespace aikartos::memory {
 				       reinterpret_cast<void*>(curr));
 				curr = curr->next;
 			}
+			dump_heap(printer);
 		}
 
 	private:
