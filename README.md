@@ -54,6 +54,7 @@ The project is written in **C++20**.
 | [`stack_overflow.cpp`](aikartos/src/tests/stack_overflow.cpp) | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
 | [`producer_consumer.cpp`](aikartos/src/tests/producer_consumer.cpp) | Demonstrates a simple Producer-Consumer system using a shared lock-free queue and cooperative task switching. |
 | [`coop_preemptive.cpp`](aikartos/src/tests/coop_preemptive.cpp) | Demonstrates hybrid Cooperative-Preemptive scheduling where each task can have its own quantum or run cooperatively. |
+| [`sch_cfs_like.cpp`](aikartos/src/tests/sch_cfs_like.cpp) | Demonstrates a CFS-like scheduler where tasks are selected based on the smallest virtual runtime to ensure balanced CPU time distribution.
 | [`memory_allocator_bump.cpp`](aikartos/src/tests/memory_allocator_bump.cpp) | Demonstrates a simple bump allocator used to manage memory in a linear fashion. |
 | [`memory_allocation_free_list.cpp`](aikartos/src/tests/memory_allocation_free_list.cpp) | Demonstrates a basic free-list memory allocator with support for reuse and fragmentation handling. |
 
