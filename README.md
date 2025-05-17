@@ -31,6 +31,7 @@ The project is written in **C++20**.
 
 - Basic task switching
 - Multiple scheduler implementations (e.g., Round-Robin, Fixed Priority)
+- Simple memory allocator implementations (e.g., bump, free list)
 - Simple startup sequence
 - Designed for STM32 Cortex-M4 MCUs
 - Written in C++20
