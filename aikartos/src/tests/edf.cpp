@@ -11,6 +11,9 @@
 #include "aikartos/sch/scheduler_edf.hpp"
 
 #include "tests.hpp"
+
+#ifdef ENABLE_TEST_edf
+
 using namespace aikartos;
 
 namespace {
@@ -40,8 +43,7 @@ namespace tests {
 
 	std::uint32_t killed_tasks = 0;
 
-	int edf(void)
-	{
+	int test::run() {
 		using config = kernel::config;
 		namespace sch_ns = sch::edf;
 		kernel::init<sch_ns::scheduler, config>();
@@ -60,5 +62,7 @@ namespace tests {
 
 		kernel::launch(10);
 		PANIC("Should not be here");
-	}
+	};
 }
+
+#endif

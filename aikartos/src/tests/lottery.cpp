@@ -12,6 +12,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_lottery
+
 using namespace aikartos;
 
 namespace {
@@ -39,7 +41,7 @@ namespace {
 
 namespace tests {
 
-	int lottery(void)
+	int test::run(void)
 	{
 		using config = kernel::config;
 		using config_flags = sch::lottery::config_flags;
@@ -53,3 +55,5 @@ namespace tests {
 		PANIC("Should not be here");
 	}
 }
+
+#endif

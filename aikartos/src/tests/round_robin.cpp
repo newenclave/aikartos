@@ -14,6 +14,8 @@
 
 using namespace aikartos;
 
+#ifdef ENABLE_TEST_round_robin
+
 namespace {
 	void task0(void *)
 	{
@@ -39,7 +41,7 @@ namespace {
 
 namespace tests {
 
-	int round_robin(void)
+	int test::run(void)
 	{
 		using config = kernel::config;
 		namespace sch_ns = sch::round_robin;
@@ -54,3 +56,4 @@ namespace tests {
 	}
 }
 
+#endif

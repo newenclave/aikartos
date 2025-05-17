@@ -12,6 +12,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_priority_aging
+
 using namespace aikartos;
 
 namespace {
@@ -39,7 +41,8 @@ namespace {
 }
 
 namespace tests {
-	int priority_aging(void)
+
+	int test::run(void)
 	{
 
 		using config = kernel::config;
@@ -59,3 +62,5 @@ namespace tests {
 	}
 
 }
+
+#endif

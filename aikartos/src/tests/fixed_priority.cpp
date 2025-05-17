@@ -11,6 +11,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_fixed_priority
+
 using namespace aikartos;
 
 namespace {
@@ -37,7 +39,8 @@ namespace {
 }
 
 namespace tests {
-	int fixed_priority(void)
+
+	int test::run(void)
 	{
 
 		using config = kernel::config;
@@ -58,3 +61,5 @@ namespace tests {
 	}
 
 }
+
+#endif

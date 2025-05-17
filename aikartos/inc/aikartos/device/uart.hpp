@@ -8,12 +8,30 @@
 
 #pragma once 
 
+#include <stdarg.h>
+
 #include "aikartos/const/constants.hpp"
 #include "aikartos/device/device.hpp"
 
 namespace device {
 	class uart {
 	public:
+
+		template <std::size_t BufSize = 128>
+		static void printf(const char* format, ...) {
+			char buf[BufSize];
+			va_list args;
+			va_start(args, format);
+			int len = vsnprintf(buf, sizeof(buf), format, args);
+			va_end(args);
+
+			if (len > 0) {
+				if (len > (int)sizeof(buf)) {
+					len = sizeof(buf);
+				}
+				blocking_write(buf, len);
+			}
+		}
 
 		static void init_tx() {
 			// enable clock access GPIOA

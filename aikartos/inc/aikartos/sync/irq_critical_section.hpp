@@ -12,20 +12,10 @@
 namespace aikartos::sync {
 	struct irq_critical_section {
 		irq_critical_section() {
-			lock();
-		}
-		~irq_critical_section() {
-			unlock();
-		}
-		void lock() {
 			__disable_irq();
 		}
-		void unlock() {
+		~irq_critical_section() {
 			__enable_irq();
-		}
-		bool try_lock() {
-			lock();
-			return true;
 		}
 	};
 }

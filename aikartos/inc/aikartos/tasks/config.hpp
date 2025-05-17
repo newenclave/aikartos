@@ -68,7 +68,7 @@ namespace aikartos::tasks {
 #ifdef CONFIG_DEBUG
 			store_.set(position, { .tag = utils::static_type_info<T>::id(), .value = value });
 #else
-			store_.set(posision, value);
+			store_.set(position, value);
 #endif
 			return *this;
 		}

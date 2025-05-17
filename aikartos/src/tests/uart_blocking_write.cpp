@@ -18,6 +18,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_uart_blocking_write
+
 using namespace aikartos;
 
 namespace {
@@ -73,7 +75,7 @@ namespace {
 
 namespace tests {
 
-	int uart_blocking_write(void)
+	int test::run(void)
 	{
 		using config = kernel::config;
 		namespace sch_ns = sch::round_robin;
@@ -89,3 +91,5 @@ namespace tests {
 		PANIC("Should not be here");
 	}
 }
+
+#endif

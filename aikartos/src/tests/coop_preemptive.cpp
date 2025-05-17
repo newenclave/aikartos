@@ -14,6 +14,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_coop_preemptive
+
 using namespace aikartos;
 
 namespace {
@@ -59,8 +61,7 @@ namespace {
 
 namespace tests {
 
-	int coop_preemptive(void)
-	{
+	int test::run() {
 		using config = kernel::config;
 		namespace sch_ns = sch::coop_preemptive;
 		using flags = sch_ns::config_flags;
@@ -74,5 +75,7 @@ namespace tests {
 
 		kernel::launch(10);
 		PANIC("Should not be here");
-	}
+	};
 }
+
+#endif

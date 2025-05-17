@@ -11,6 +11,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_weighted_lottery
+
 using namespace aikartos;
 
 namespace {
@@ -38,7 +40,7 @@ namespace {
 
 namespace tests {
 
-	int weighted_lottery(void)
+	int test::run(void)
 	{
 		using config = kernel::config;
 		using config_flags = sch::weighted_lottery::config_flags;
@@ -56,3 +58,5 @@ namespace tests {
 		PANIC("Should not be here");
 	}
 }
+
+#endif // weighted_lottery_tag

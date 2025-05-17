@@ -20,6 +20,8 @@
 
 #include "tests.hpp"
 
+#ifdef ENABLE_TEST_producer_consumer
+
 using namespace aikartos;
 
 namespace {
@@ -107,9 +109,10 @@ namespace {
 
 }
 
+
 namespace tests {
 
-	int producer_consumer(void)
+	int test::run(void)
 	{
 		using config = kernel::config;
 		namespace sch_ns = sch::round_robin;
@@ -126,3 +129,5 @@ namespace tests {
 		PANIC("Should not be here");
 	}
 }
+
+#endif

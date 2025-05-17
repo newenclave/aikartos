@@ -74,7 +74,7 @@ namespace aikartos::kernel {
 			return &object->tcb;
 		}
 
-		virtual std::tuple<control_block *, sch::scheduler_specific_event> get_next_task() override {
+		std::tuple<control_block *, sch::scheduler_specific_event> get_next_task() override {
 			if constexpr (std::is_same_v<decltype(scheduler_.get_next_task()), control_block *>) {
 				auto next_tcb = scheduler_.get_next_task();
 				return { next_tcb ? next_tcb : &idle_.tcb, sch::events::OK };

@@ -24,11 +24,14 @@
 #include <errno.h>
 #include <stdint.h>
 
+#define DISABLE_SBRK
+
 /**
  * Pointer to the current high watermark of the heap usage
  */
+#ifndef DISABLE_SBRK
 static uint8_t *__sbrk_heap_end = NULL;
-
+#endif
 /**
  * @brief _sbrk() allocates memory to the newlib heap and is used by malloc
  *        and others from the C library
@@ -52,6 +55,8 @@ static uint8_t *__sbrk_heap_end = NULL;
  */
 void *_sbrk(ptrdiff_t incr)
 {
+  return (void *)-1;
+#ifndef DISABLE_SBRK
   extern uint8_t _end; /* Symbol defined in the linker script */
   extern uint8_t _estack; /* Symbol defined in the linker script */
   extern uint32_t _Min_Stack_Size; /* Symbol defined in the linker script */
@@ -76,4 +81,5 @@ void *_sbrk(ptrdiff_t incr)
   __sbrk_heap_end += incr;
 
   return (void *)prev_heap_end;
+#endif
 }
