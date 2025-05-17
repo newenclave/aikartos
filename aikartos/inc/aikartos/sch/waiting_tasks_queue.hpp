@@ -19,7 +19,7 @@ namespace aikartos::sch {
 	public:
 
 		constexpr static std::size_t maximum_tasks = MaximumTasks;
-		using control_block = tasks::control_block<>;
+		using control_block = tasks::control_block;
 		using mutex_type = MutexT;
 
 		struct wait_less_time {

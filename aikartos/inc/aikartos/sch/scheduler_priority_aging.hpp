@@ -32,7 +32,7 @@ namespace aikartos::sch {
 			constexpr static std::size_t maximum_tasks = ConfigT::maximum_tasks;
 
 			using tasks_events_type = TasksEventsType;
-			using control_block = tasks::control_block<>;
+			using control_block = tasks::control_block;
 
 			constexpr static std::size_t maximum_priority = 3;
 			using ready_block_queue_type = sync::circular_queue<control_block *, maximum_tasks, sync::policies::no_mutex>;

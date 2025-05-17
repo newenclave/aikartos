@@ -11,11 +11,10 @@
 #include <cstdint>
 
 namespace aikartos::tasks {
-	template <typename WordType = std::uint32_t>
-	struct alignas(8) control_block {
-		using word_type = WordType;
 
-		word_type *stack = nullptr;
+	struct alignas(8) control_block {
+
+		std::uintptr_t stack = 0;
 
 		using task_entry = tasks::descriptor::task_entry;
 		using task_parameter = tasks::descriptor::task_parameter;
@@ -28,14 +27,13 @@ namespace aikartos::tasks {
 			return reinterpret_cast<T *>(scheduler_data);
 		}
 
-		inline void push(word_type value) {
-			*(--stack) = value;
+		template <typename WordType = std::uint32_t>
+		inline void push(WordType value) {
+			auto wstack = reinterpret_cast<WordType *>(stack);
+			*(--wstack) = value;
+			stack = reinterpret_cast<std::uintptr_t>(wstack);
 		}
 
-		[[nodiscard]]
-		inline word_type pop() {
-			return *(stack++);
-		}
 	};
 }
 

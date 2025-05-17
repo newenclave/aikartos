@@ -20,7 +20,7 @@ namespace aikartos::kernel {
 	class impl_base {
 	public:
 
-		using control_block = tasks::control_block<>;
+		using control_block = tasks::control_block;
 		using task_entry = control_block::task_entry;
 		using task_parameter = control_block::task_parameter;
 

@@ -14,7 +14,7 @@
 namespace aikartos::kernel {
 	class api {
 	public:
-		using task_block = tasks::control_block<>;
+		using task_block = tasks::control_block;
 		static void yield() {
 			SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 		}

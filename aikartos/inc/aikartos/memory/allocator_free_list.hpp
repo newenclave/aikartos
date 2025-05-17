@@ -131,7 +131,7 @@ namespace aikartos::memory {
 
 		void dump_heap(printer_type printer) const override {
 			auto* curr = get_first_block();
-			printf("Heap layout:\r\n");
+			printer("Heap layout:\r\n");
 
 			const auto scale_factor = total() / 64;
 

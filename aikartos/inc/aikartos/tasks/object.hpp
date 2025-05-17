@@ -17,10 +17,9 @@ namespace aikartos::tasks {
 		static_assert(StackSize >= 32, "The size of the stack should be at least 32 words");
 
 		using word_type = WordType;
-		using control_type = control_block<word_type>;
 
 		constexpr void reset_stack() {
-			tcb.stack = &stack[StackSize];
+			tcb.stack = reinterpret_cast<std::uintptr_t>(&stack[StackSize]);
 #ifdef DEBUG
 		    for (std::size_t i = 0; i < StackSize; ++i) {
 		        stack[i] = 0xDEADBEEF;
@@ -32,7 +31,7 @@ namespace aikartos::tasks {
 			reset_stack();
 		}
 
-		control_type tcb;
+		control_block tcb;
 		alignas(8) word_type stack[StackSize];
 	};
 }

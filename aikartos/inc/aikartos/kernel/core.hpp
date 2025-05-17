@@ -36,7 +36,7 @@ namespace aikartos::kernel {
 	class core {
 	public:
 
-		using task_block = tasks::control_block<>;
+		using task_block = tasks::control_block;
 		using task_entry = tasks::descriptor::task_entry;
 		using task_parameter = tasks::descriptor::task_parameter;
 

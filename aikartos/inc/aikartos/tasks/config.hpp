@@ -25,26 +25,27 @@ namespace aikartos::tasks {
 	};
 
 	class config {
-			template <auto Flag>
-			consteval static std::size_t first_bit() {
-				using T = decltype(Flag);
-				constexpr T value = Flag;
-				//using UT = std::make_unsigned_t<std::underlying_type_t<T>>;
-				using UT = std::make_unsigned_t<T>;
-				UT x = static_cast<UT>(value);
+		template <auto Flag>
+		consteval static std::size_t first_bit() {
+			using T = decltype(Flag);
+			constexpr T value = Flag;
+			//using UT = std::make_unsigned_t<std::underlying_type_t<T>>;
+			using UT = std::make_unsigned_t<T>;
+			UT x = static_cast<UT>(value);
 
-				if (x == 0) {
-					return std::numeric_limits<std::size_t>::max();
-				}
-
-				std::size_t count = 0;
-				while ((x & 1) == 0) {
-					x >>= 1;
-					++count;
-				}
-				return count;
+			if (x == 0) {
+				return std::numeric_limits<std::size_t>::max();
 			}
-		public:
+
+			std::size_t count = 0;
+			while ((x & 1) == 0) {
+				x >>= 1;
+				++count;
+			}
+			return count;
+		}
+
+	public:
 
 		constexpr static std::size_t maximum_elements = 16;
 		using data_type = std::uintptr_t;
@@ -108,21 +109,4 @@ namespace aikartos::tasks {
 		storage_type store_;
 	};
 
-	// todo: the config for all schedulers. need to think ...
-	class old_config {
-	public:
-		priority_class priority = priority_class::HIGH;
-
-		std::uint32_t relative_deadline = 0;
-
-		std::uint8_t tickets = 1;
-
-		std::uint8_t threshold = 0;
-		std::uint8_t delta = 0;
-		bool agressive = false;
-
-		std::uint8_t win_threshold = 0;
-		std::uint8_t win_delta = 0;
-		bool win_agressive = false;
-	};
 }

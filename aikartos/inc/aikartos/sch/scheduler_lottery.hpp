@@ -30,7 +30,7 @@ namespace aikartos::sch {
 
 			constexpr static std::size_t maximum_tasks = config::maximum_tasks;
 
-			using control_block  = tasks::control_block<>;
+			using control_block  = tasks::control_block;
 			using tasks_events_type = TasksEventsType;
 
 			struct scheduler_data_type {

@@ -14,13 +14,13 @@
 //#define ENABLE_TEST_fixed_priority
 //#define ENABLE_TEST_weighted_lottery
 //#define ENABLE_TEST_coop_preemptive
-//#define ENABLE_TEST_lottery
+#define ENABLE_TEST_lottery
 //#define ENABLE_TEST_priority_aging
 //#define ENABLE_TEST_stack_overflow
 //#define ENABLE_TEST_uart_blocking_write
 //#define ENABLE_TEST_producer_consumer
 
-#define ENABLE_TEST_memory_allocation_free_list
+//#define ENABLE_TEST_memory_allocation_free_list
 //#define ENABLE_TEST_memory_allocation_bump_list
 
 namespace tests {

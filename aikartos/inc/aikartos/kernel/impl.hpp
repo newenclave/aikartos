@@ -35,7 +35,7 @@ namespace aikartos::kernel {
 
 	private:
 		struct scheduler_callbacks {
-			static void on_task_done(tasks::control_block<> *object) {
+			static void on_task_done(tasks::control_block *object) {
 				scheduler_.clear_task(object);
 
 				sync::irq_critical_section dirq;
@@ -53,7 +53,7 @@ namespace aikartos::kernel {
 
 		using scheduler_type = SchedulerT<config_type, scheduler_callbacks>;
 
-		using control_block = tasks::control_block<>;
+		using control_block = tasks::control_block;
 		using task_entry = impl_base::task_entry;
 		using task_parameter = impl_base::task_parameter;
 
@@ -107,24 +107,24 @@ namespace aikartos::kernel {
 
 		void task_object_staсk_init(control_block &tcb, int32_t task) {
 
-			tcb.push(xPSR_T_Msk); // 0x01000000
-			tcb.push(task);
-			tcb.push(0x14141414);  //R14
-			tcb.push(0x12121212);  //R12
-			tcb.push(0x03030303);  //R3
-			tcb.push(0x02020202);  //R2
-			tcb.push(0x01010101);  //R1
-			tcb.push(0x00000000);  //R0
+			tcb.push<std::uint32_t>(xPSR_T_Msk); // 0x01000000
+			tcb.push<std::uint32_t>(task);
+			tcb.push<std::uint32_t>(0x14141414);  //R14
+			tcb.push<std::uint32_t>(0x12121212);  //R12
+			tcb.push<std::uint32_t>(0x03030303);  //R3
+			tcb.push<std::uint32_t>(0x02020202);  //R2
+			tcb.push<std::uint32_t>(0x01010101);  //R1
+			tcb.push<std::uint32_t>(0x00000000);  //R0
 
 			/*  We have to save manually  */
-			tcb.push(0x11111111); //R11
-			tcb.push(0x10101010); //R10
-			tcb.push(0x09090909); //R9
-			tcb.push(0x08080808); //R8
-			tcb.push(0x07070707); //R7
-			tcb.push(0x06060606); //R6
-			tcb.push(0x05050505); //R5
-			tcb.push(0x04040404); //R4
+			tcb.push<std::uint32_t>(0x11111111); //R11
+			tcb.push<std::uint32_t>(0x10101010); //R10
+			tcb.push<std::uint32_t>(0x09090909); //R9
+			tcb.push<std::uint32_t>(0x08080808); //R8
+			tcb.push<std::uint32_t>(0x07070707); //R7
+			tcb.push<std::uint32_t>(0x06060606); //R6
+			tcb.push<std::uint32_t>(0x05050505); //R5
+			tcb.push<std::uint32_t>(0x04040404); //R4
 		}
 
 		inline static utils::object_pool<task_object, maximum_tasks> pool_;
