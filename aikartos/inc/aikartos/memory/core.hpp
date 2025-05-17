@@ -29,7 +29,9 @@ namespace aikartos::memory {
 				PANIC("Allocator already initialized");
 			}
 		}
+
 		static std::size_t total_memory() {
+			DEBUG_ASSERT(instance_ != nullptr, "Allocator not initialized");
 			return instance_->total();
 		}
 

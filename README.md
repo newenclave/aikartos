@@ -39,20 +39,22 @@ The project is written in **C++20**.
 
 ## Examples 
 
-> All examples can be found in the `aikartos/src/tests` folder.
+> All examples can be found in the [`aikartos/src/tests`](aikartos/src/tests) folder.
 
 
-| Example                  | Description                                                                 |
-|--------------------------|-----------------------------------------------------------------------------|
-| `round_robin.cpp`        | Demonstrates basic Round-Robin task switching between three simple infinite loops. |
-| `edf.cpp`                | Demonstrates Earliest Deadline First (EDF) scheduling with tasks having different deadlines. |
-| `fixed_priority.cpp`     | Demonstrates Fixed Priority scheduling where tasks are executed based on static priorities. |
-| `lottery.cpp`            | Demonstrates Lottery Scheduling where tasks are chosen randomly based on ticket allocation. |
-| `priority_aging.cpp`     | Demonstrates Priority Scheduling with Aging to prevent starvation of low-priority tasks. |
-| `weighted_lottery.cpp`   | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
-| `stack_overflow.cpp`     | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
-| `producer_consumer.cpp`  | Demonstrates a simple Producer-Consumer system using a shared lock-free queue and cooperative task switching. |
-| `coop_preemptive.cpp`	   | Demonstrates hybrid Cooperative-Preemptive scheduling where each task can have its own quantum or run cooperatively. |
+| Example | Description |
+|------|-------------|
+| [`round_robin.cpp`](aikartos/src/tests/round_robin.cpp) | Demonstrates basic Round-Robin task switching between three simple infinite loops. |
+| [`edf.cpp`](aikartos/src/tests/edf.cpp) | Demonstrates Earliest Deadline First (EDF) scheduling with tasks having different deadlines. |
+| [`fixed_priority.cpp`](aikartos/src/tests/fixed_priority.cpp) | Demonstrates Fixed Priority scheduling where tasks are executed based on static priorities. |
+| [`lottery.cpp`](aikartos/src/tests/lottery.cpp) | Demonstrates Lottery Scheduling where tasks are chosen randomly based on ticket allocation. |
+| [`priority_aging.cpp`](aikartos/src/tests/priority_aging.cpp) | Demonstrates Priority Scheduling with Aging to prevent starvation of low-priority tasks. |
+| [`weighted_lottery.cpp`](aikartos/src/tests/weighted_lottery.cpp) | Demonstrates Weighted Lottery Scheduling where tasks have different chances of being selected based on weight. |
+| [`stack_overflow.cpp`](aikartos/src/tests/stack_overflow.cpp) | Demonstrates system behavior when a stack overflow occurs in a task. Useful for testing robustness. |
+| [`producer_consumer.cpp`](aikartos/src/tests/producer_consumer.cpp) | Demonstrates a simple Producer-Consumer system using a shared lock-free queue and cooperative task switching. |
+| [`coop_preemptive.cpp`](aikartos/src/tests/coop_preemptive.cpp) | Demonstrates hybrid Cooperative-Preemptive scheduling where each task can have its own quantum or run cooperatively. |
+| [`memory_allocator_bump.cpp`](aikartos/src/tests/memory_allocator_bump.cpp) | Demonstrates a simple bump allocator used to manage memory in a linear fashion. |
+| [`memory_allocation_free_list.cpp`](aikartos/src/tests/memory_allocation_free_list.cpp) | Demonstrates a basic free-list memory allocator with support for reuse and fragmentation handling. |
 
 ---
 
