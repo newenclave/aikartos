@@ -11,7 +11,7 @@
 
 //#define ENABLE_TEST_round_robin
 //#define ENABLE_TEST_edf
-#define ENABLE_TEST_fixed_priority
+//#define ENABLE_TEST_fixed_priority
 //#define ENABLE_TEST_weighted_lottery
 //#define ENABLE_TEST_coop_preemptive
 //#define ENABLE_TEST_lottery
@@ -23,6 +23,7 @@
 //#define ENABLE_TEST_memory_allocation_free_list
 //#define ENABLE_TEST_memory_allocation_bump_list
 //#define ENABLE_TEST_sch_cfs_like
+#define ENABLE_TEST_sch_mlfq
 
 namespace tests {
 	constexpr std::uint32_t COUNT_SIZE = 5;

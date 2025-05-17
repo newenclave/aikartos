@@ -9,6 +9,7 @@
 #pragma once 
 
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "aikartos/const/constants.hpp"
 #include "aikartos/device/device.hpp"

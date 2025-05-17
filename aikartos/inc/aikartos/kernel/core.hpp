@@ -39,6 +39,8 @@ namespace aikartos::kernel {
 		using task_block = tasks::control_block;
 		using task_entry = tasks::descriptor::task_entry;
 		using task_parameter = tasks::descriptor::task_parameter;
+		using systick_hook_type = impl_base::systick_hook_type;
+		using systick_hook_parameter_type = impl_base::systick_hook_parameter_type;
 
 		template <
 				template<typename, typename> typename SchedulerT,
@@ -60,38 +62,56 @@ namespace aikartos::kernel {
 
 			impl_base::quanta_ = quanta;
 			impl_base::default_quanta_ = quanta;
-			get_first_task();
+			init_first_task();
 			kernel_launch_impl();
 		}
 
-		static std::uint32_t get_systick_val() {
+		inline static std::uint32_t get_systick_val() {
 			return SysTick->VAL;
 		}
 
-		static std::uint32_t get_tick_count() {
+		inline static std::uint32_t get_tick_count() {
 			return tick_count_;
 		}
 
-		static std::uint32_t get_quanta() {
+		inline static std::uint32_t get_quanta() {
 			return impl_base::quanta_;
 		}
 
-		static std::uint32_t get_default_quanta() {
+		inline static std::uint32_t get_default_quanta() {
 			return impl_base::default_quanta_;
 		}
 
-		static void set_scheduler_event_handler (sch::events::handler_type cb) {
-			instance_->set_scheduler_event_handler_ = cb;
+		inline static void register_scheduler_event_handler (sch::events::handler_type cb) {
+			instance_->scheduler_event_handler_ = cb;
 		}
 
-		static void add_task(task_entry task, task_parameter parameter = nullptr) {
+		inline static sch::events::handler_type get_scheduler_event_handler() {
+			return instance_->scheduler_event_handler_;
+		}
+
+		inline static void register_systick_hook(systick_hook_type hook, systick_hook_parameter_type param) {
+			instance_->systick_hook_ = hook;
+			instance_->systick_hook_parameter_ = param;
+		}
+
+		inline static systick_hook_type get_systick_hook() {
+			return instance_->systick_hook_;
+		}
+
+		inline static systick_hook_parameter_type get_systick_hook_parameter() {
+			return instance_->systick_hook_parameter_;
+		}
+
+		inline static void add_task(task_entry task, task_parameter parameter = nullptr) {
 			core::add_task(task, tasks::config{}, parameter);
 		}
+
 		static void add_task(task_entry task, const tasks::config &config, task_parameter parameter = nullptr);
 
 	private:
 
-		static void get_first_task();
+		static void init_first_task();
 
 		friend struct handlers_friend;
 		inline static volatile std::uint32_t tick_count_ = 0;

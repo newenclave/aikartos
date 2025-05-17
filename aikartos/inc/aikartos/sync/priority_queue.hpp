@@ -60,6 +60,13 @@ namespace aikartos::sync {
 			return { value };
 		}
 
+		template <typename CallBackT>
+		inline void foreach(CallBackT cb) {
+			for(std::size_t i = 0; i < count_; ++i) {
+				cb(items_[i]);
+			}
+		}
+
 	private:
 		std::array<element_type, queue_size> items_;
 		std::size_t count_ = 0;

@@ -33,7 +33,7 @@ namespace aikartos::kernel {
 	}
 
 	inline void set_scheduler_event_handler(sch::events::handler_type cb) {
-		core::set_scheduler_event_handler(cb);
+		core::register_scheduler_event_handler(cb);
 	}
 
 	inline auto terminate_current(bool need_yield = true) {

@@ -18,14 +18,22 @@ namespace aikartos::kernel {
 			static std::uint32_t quanta = core::get_quanta();
 			std::uint32_t current_quanta = core::get_quanta();
 
-			if(current_quanta != quanta) {
-				quanta = current_quanta;
-				counter = 0;
+			if(auto *hook = kernel::core::get_systick_hook()) {
+				if(hook(kernel::core::get_systick_hook_parameter())) {
+					counter = 0;
+					SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+				}
 			}
+			else {
+				if(current_quanta != quanta) {
+					quanta = current_quanta;
+					counter = 0;
+				}
 
-			if((constants::quanta_infinite != quanta) && (++counter >= quanta)) {
-				counter = 0;
-				SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+				if((constants::quanta_infinite != quanta) && (++counter >= quanta)) {
+					counter = 0;
+					SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+				}
 			}
 		}
 
@@ -33,8 +41,8 @@ namespace aikartos::kernel {
 			while (1) {
 			    auto [next, event] = kernel::core::instance_->get_next_task();
 			    g_current_tcb_ptr = next;
-			    if (event != sch::events::OK && kernel::core::instance_->set_scheduler_event_handler_) {
-			        auto decision = kernel::core::instance_->set_scheduler_event_handler_(event);
+			    if (event != sch::events::OK && kernel::core::get_scheduler_event_handler()) {
+			        auto decision = kernel::core::get_scheduler_event_handler()(event);
 			        if (decision == sch::decision::RETRY) {
 			            continue;
 			        }
@@ -51,7 +59,7 @@ namespace aikartos::kernel {
 			g_current_tcb_ptr = added;
 		}
 	}
-	void core::get_first_task() {
+	void core::init_first_task() {
 	    auto [next, _] = instance_->get_next_task();
 		g_current_tcb_ptr = next;
 	}
