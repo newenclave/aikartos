@@ -34,6 +34,11 @@ namespace aikartos::sch {
 		}
 
 		template <typename CallBackT>
+		void foreach(CallBackT cb) {
+			queue_.foreach(std::move(cb));
+		}
+
+		template <typename CallBackT>
 		inline void process(CallBackT cb) {
 			auto const ticks = kernel::core::get_tick_count();
 			while(auto next = queue_.peek()) {

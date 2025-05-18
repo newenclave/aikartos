@@ -11,6 +11,7 @@
 
 #include "aikartos/kernel/config.hpp"
 #include "aikartos/sch/events.hpp"
+#include "aikartos/sch/statistic.hpp"
 #include "aikartos/tasks/config.hpp"
 #include "aikartos/tasks/object.hpp"
 
@@ -30,6 +31,7 @@ namespace aikartos::kernel {
 		virtual ~impl_base() = default;
 		virtual control_block *add_task(task_entry, task_parameter, const tasks::config &) = 0;
 		virtual std::tuple<control_block *, sch::scheduler_specific_event> get_next_task() = 0;
+		virtual bool get_scheduler_statistic(sch::statistic_base &) = 0;
 
 	protected:
 		friend class kernel::core;

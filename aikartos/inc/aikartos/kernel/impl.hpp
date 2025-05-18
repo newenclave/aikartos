@@ -45,6 +45,7 @@ namespace aikartos::kernel {
 				kernel::impl_base::quanta_ = quanta;
 			};
 		};
+
 	public:
 
 		impl() {
@@ -84,6 +85,14 @@ namespace aikartos::kernel {
 				return { next_tcb ? next_tcb : &idle_.tcb, event };
 			}
 		}
+
+		bool get_scheduler_statistic(sch::statistic_base &stat) override {
+			if constexpr (sch::has_get_statistic_method<scheduler_type>::value) {
+				return scheduler_.get_statistic(stat);
+			} else {
+				return false;
+			}
+		};
 
 	private:
 

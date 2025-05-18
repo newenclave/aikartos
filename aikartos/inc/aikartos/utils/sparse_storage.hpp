@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "aikartos/utils/light_bitset.hpp"
 #include <cstdint>
 #include <concepts>
 #include <array>
 
+#include "aikartos/utils/light_bitset.hpp"
 
 namespace aikartos::utils {
 

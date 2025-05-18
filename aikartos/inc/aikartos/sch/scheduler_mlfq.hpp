@@ -19,8 +19,11 @@
 #include "aikartos/kernel/core.hpp"
 #include "aikartos/sch/events.hpp"
 #include "aikartos/sch/waiting_tasks_queue.hpp"
+#include "aikartos/sch/statistic.hpp"
+
 #include "aikartos/sync/policies/no_mutex.hpp"
 #include "aikartos/sync/priority_queue.hpp"
+#include "aikartos/sync/irq_critical_section.hpp"
 
 #include "aikartos/tasks/config.hpp"
 #include "aikartos/tasks/object.hpp"
@@ -35,14 +38,17 @@ namespace aikartos::sch {
 			boost_quanta = (1u << 1u),
 		};
 
-		enum class statistics_flags : std::uint32_t {
-			level = (1u << 0u),
+		enum class statistics_fields : std::uint32_t {
+			level = 0u,
+			state = 1u,
+			task_entry = 2u,
+			task_param = 3u,
 		};
 
 		struct quantum_levels {
-			std::uint8_t high = 5;
-			std::uint8_t middle = 10;
-			std::uint8_t low = 20;
+			std::uint8_t high = 10;
+			std::uint8_t middle = 20;
+			std::uint8_t low = 40;
 		};
 
 		template <typename ConfigT, typename TasksEventsType>
@@ -62,7 +68,7 @@ namespace aikartos::sch {
 
 			constexpr static std::size_t maximum_tasks = config::maximum_tasks;
 			constexpr static std::size_t maximum_levels = 3;
-			constexpr static std::uint32_t global_boost_value = 1000;
+			constexpr static std::uint32_t global_boost_value = 500;
 
 			using control_block = tasks::control_block;
 			using tasks_events_type = TasksEventsType;
@@ -72,7 +78,12 @@ namespace aikartos::sch {
 				std::uint32_t quantum_used = 0;
 				std::uint32_t level = 0;
 				std::uint32_t last_boost = 0;
-				std::uint32_t boost_quanta = 1000;
+				std::uint32_t boost_quanta = 500;
+				scheduler_data_type() noexcept {
+					levels[0] = 10;
+					levels[1] = 20;
+					levels[2] = 40;
+				}
 			};
 
 			using data_object_pool = utils::object_pool<scheduler_data_type, maximum_tasks, 4>;
@@ -126,6 +137,32 @@ namespace aikartos::sch {
 				levels_[get_data(task)->level].try_push(task);
 			}
 
+			bool get_statistic(sch::statistic_base &stat) {
+				// disabling IRQs here
+				sync::irq_critical_section irqd;
+				std::size_t current_task_id = 0;
+
+				const auto get_stat = [this, &current_task_id, &stat](auto *task) {
+					auto *data = get_data(task);
+					stat.add_field(current_task_id, static_cast<std::size_t>(statistics_fields::level),
+							static_cast<std::uintptr_t>(data->level));
+					stat.add_field(current_task_id, static_cast<std::size_t>(statistics_fields::state),
+							static_cast<std::uintptr_t>(task->task.state));
+					stat.add_field(current_task_id, static_cast<std::size_t>(statistics_fields::task_entry),
+							reinterpret_cast<std::uintptr_t>(task->task.task));
+					stat.add_field(current_task_id, static_cast<std::size_t>(statistics_fields::task_param),
+							reinterpret_cast<std::uintptr_t>(task->task.parameter));
+					current_task_id++;
+				};
+
+				// check all the levels
+				for(std::size_t id = 0; id < levels_.size(); ++id) {
+					levels_[id].foreach(get_stat);
+				}
+				waiting_tasks_.foreach(get_stat);
+				return true;
+			}
+
 		private:
 
 			void boost_levels() {
@@ -148,8 +185,10 @@ namespace aikartos::sch {
 					switch(task->task.state) {
 					case tasks::descriptor::state_type::READY:
 						[[fallthrough]];
-					case tasks::descriptor::state_type::RUNNING:
-						levels_[get_data(task)->level].try_push(task);
+					case tasks::descriptor::state_type::RUNNING: {
+						const auto level = get_data(task)->level;
+						levels_[level].try_push(task);
+						}
 						return task;
 					case tasks::descriptor::state_type::DONE:
 						tasks_events_type::on_task_done(task);

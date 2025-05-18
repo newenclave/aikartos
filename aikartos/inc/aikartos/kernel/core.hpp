@@ -18,6 +18,7 @@
 #include "aikartos/sch/events.hpp"
 #include "aikartos/tasks/object.hpp"
 #include "aikartos/utils/object_pool.hpp"
+#include "aikartos/sch/statistic.hpp"
 
 extern "C" void kernel_launch_impl();
 
@@ -101,6 +102,10 @@ namespace aikartos::kernel {
 
 		inline static systick_hook_parameter_type get_systick_hook_parameter() {
 			return instance_->systick_hook_parameter_;
+		}
+
+		inline static bool get_scheduler_statisctic(sch::statistic_base &stat) {
+			return instance_->get_scheduler_statistic(stat);
 		}
 
 		inline static void add_task(task_entry task, task_parameter parameter = nullptr) {
