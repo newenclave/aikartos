@@ -58,6 +58,8 @@ The project is written in **C++20**.
 | [`sch_mlfq.cpp`](aikartos/src/tests/sch_mlfq.cpp) | Demonstrates a Multilevel Feedback Queue scheduler with per-task quantum levels and automatic priority boosting. |
 | [`memory_allocator_bump.cpp`](aikartos/src/tests/memory_allocator_bump.cpp) | Demonstrates a simple bump allocator used to manage memory in a linear fashion. |
 | [`memory_allocation_free_list.cpp`](aikartos/src/tests/memory_allocation_free_list.cpp) | Demonstrates a basic free-list memory allocator with support for reuse and fragmentation handling. |
+| [`memory_allocation_dlist.cpp`](aikartos/src/tests/memory_allocation_dlist.cpp) | Demonstrates a double-linked free-list allocator with bidirectional coalescing and minimal overhead on allocation. |
+
 
 ---
 
