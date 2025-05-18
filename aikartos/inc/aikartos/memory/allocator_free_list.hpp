@@ -89,7 +89,12 @@ namespace aikartos::memory {
 			// an unused or the very last block
 			// the last block;
 			const auto allocate_ptr = reinterpret_cast<std::uintptr_t>(next) + header_size;
-			if (next->size() > (full_block_size + min_payload)) { // possible to insert a block
+
+			// here is:
+			// header_size - parent block,
+			// full_block_size new chunk (block_header + size)
+			// min_payload is just so that no small blocks are left.
+			if (next->size() > (header_size + full_block_size + min_payload)) { // possible to insert a block
 
 				auto next_block = create_block(allocate_ptr + fixed_size);
 
