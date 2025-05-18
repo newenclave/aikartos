@@ -1,14 +1,17 @@
 /*
  *
- * @file allocator_free_list.hpp
- * @brief Single-linked free list allocator with forward coalescing.
+ * @file allocator_dlist.hpp
+ * @brief Double-linked free list allocator with full (bidirectional) coalescing.
  *
- * - Memory is managed as a singly linked list of variable-size blocks.
- * - `alloc()` searches for a suitable free block and splits it if possible.
- * - `free()` marks blocks as free and optionally merges them with next neighbors.
- * - Merge on allocation ensures contiguous memory reuse and reduces fragmentation.
+ * - Memory blocks are arranged in a doubly linked list.
+ * - `alloc()` finds and splits free blocks without requiring any merging.
+ * - All coalescing logic is moved into `free()`, which merges adjacent free blocks
+ *   in both forward and backward directions.
+ * - This separation reduces overhead on allocation and ensures memory compaction
+ *   happens only when blocks are released.
+ * - Provides more efficient reuse and defragmentation than singly linked variant.
  *
- *  Created on: May 17, 2025
+ *  Created on: May 18, 2025
  *      Author: newenclave
  *  
  */
@@ -21,7 +24,7 @@
 namespace aikartos::memory {
 
 	template <std::size_t Align = alignof(std::max_align_t)>
-	class allocator_free_list: public memory::allocator_base {
+	class allocator_dlist: public memory::allocator_base {
 	public:
 
 		static_assert(Align % 2 == 0, "A power of two is what Align should be");
@@ -33,6 +36,7 @@ namespace aikartos::memory {
 		struct alignas(align_value) block_header {
 
 			std::size_t allocated_size_ = 0;
+			block_header* prev = nullptr;
 			block_header* next = nullptr;
 
 			std::size_t size() const {
@@ -67,15 +71,12 @@ namespace aikartos::memory {
 			first_block->resize(end_ptr - begin_ptr);
 		}
 
-		void* alloc(std::size_t size) override {
+		void* alloc(std::size_t size) {
 			auto next = get_first_block();
 			const auto fixed_size = fix_value_by_align(size);
 			const auto full_block_size = fixed_size + header_size;
 
 			while (true) {
-				if (!next->is_used()) {
-					merge_forward(next);
-				}
 				if (!next->is_used() && (next->size() >= full_block_size)) {
 					break;
 				}
@@ -93,8 +94,12 @@ namespace aikartos::memory {
 
 				auto next_block = create_block(allocate_ptr + fixed_size);
 
+				next_block->prev = next;
 				next_block->resize(next->size() - full_block_size);
 				next_block->next = next->next;
+				if (next_block->next) {
+					next_block->next->prev = next_block;
+				}
 
 				next->next = next_block;
 				next->resize(full_block_size);
@@ -105,7 +110,7 @@ namespace aikartos::memory {
 			return reinterpret_cast<void*>(allocate_ptr);
 		}
 
-		void free(void *ptr) override {
+		void free(void* ptr) {
 			// how to validate the ptr?
 			if (ptr == nullptr) {
 				return;
@@ -118,6 +123,7 @@ namespace aikartos::memory {
 			if (header->is_used()) {
 				header->mark_free();
 				merge_forward(header);
+				merge_backward(header);
 			}
 		}
 
@@ -176,10 +182,24 @@ namespace aikartos::memory {
 
 	private:
 
+		void merge_backward(block_header* header) {
+			while (header->prev && !header->prev->is_used()) {
+				header = header->prev;
+				header->resize(header->size() + header->next->size());
+				header->next = header->next->next;
+				if (header->next) {
+					header->next->prev = header;
+				}
+			}
+		}
+
 		void merge_forward(block_header* header) {
 			while (header->next && !header->next->is_used()) {
 				header->resize(header->size() + header->next->size());
 				header->next = header->next->next;
+				if (header->next) {
+					header->next->prev = header;
+				}
 			}
 		}
 

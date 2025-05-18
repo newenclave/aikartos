@@ -1,11 +1,17 @@
 /*
- * allocator_bump.hpp
+ *
+ * @file allocator_bump.hpp
+ * @brief Simple linear bump allocator with no deallocation support.
+ *
+ * - Memory is allocated linearly by advancing a pointer from the start of the heap.
+ * - No `free()` operation is supported — memory is allocated once and never reclaimed.
+ * - Very fast and deterministic, ideal for static or one-shot allocations (e.g. stacks, RTOS objects).
+ * - Minimal overhead and bookkeeping; no fragmentation.
  *
  *  Created on: May 17, 2025
  *      Author: newenclave
  *  
  */
-
 
 #pragma once 
 
