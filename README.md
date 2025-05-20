@@ -58,7 +58,7 @@ The project is written in **C++20**.
 | [`sch_mlfq.cpp`](aikartos/src/tests/sch_mlfq.cpp) | Demonstrates a Multilevel Feedback Queue scheduler with per-task quantum levels and automatic priority boosting. |
 | [`memory_allocator_bump.cpp`](aikartos/src/tests/memory_allocator_bump.cpp) | Demonstrates a simple bump allocator used to manage memory in a linear fashion. |
 | [`memory_allocator_free_list.cpp`](aikartos/src/tests/memory_allocator_free_list.cpp) | Demonstrates a basic free-list memory allocator with support for reuse and fragmentation handling. |
-| [`memory_allocator_dlist.cpp`](aikartos/src/tests/memory_allocator_dlist.cpp) | Demonstrates a basic free-list memory allocator with support for reuse and fragmentation handling. |
+| [`memory_allocator_dlist.cpp`](aikartos/src/tests/memory_allocator_dlist.cpp) | Demonstrates a double-linked free-list allocator with bidirectional coalescing and minimal overhead on allocation. |
 | [`memory_allocator_buddy.cpp`](aikartos/src/tests/memory_allocator_buddy.cpp) | Tests an arena-based buddy allocator (`buddy::impl::region`) that stores all metadata in external memory.|
 | [`memory_allocator_buddy_fixed.cpp`](aikartos/src/tests/memory_allocator_buddy_fixed.cpp) | Tests a statically bounded buddy allocator (`buddy::impl::fixed`) with internal free list table.         |
 
