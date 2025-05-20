@@ -7,11 +7,10 @@
 
 #pragma once
 
-#ifndef PLATFORM_F411_CORE
-#	define PLATFORM_F411_CORE
+#ifdef PLATFORM_f411_CORE
 #	ifndef STM32F411xE
 #		define STM32F411xE
 #	endif
+#	include <stm32f4xx.h>
 #endif
 
-#include <stm32f4xx.h>
