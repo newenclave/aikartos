@@ -1,12 +1,18 @@
-/*
- * mem_alloc_buddy.cpp
+/**
+ * @file tests/memory_allocator_buddy.cpp
+ * @brief Buddy allocator test using in-place region-based memory.
+ *
+ * - Initializes a `buddy::impl::region` allocator over a memory block allocated at runtime.
+ * - All allocator metadata, including free list table, is placed inside the arena.
+ * - Performs randomized allocations and deallocations (10,000 cycles).
+ * - Demonstrates dynamic memory layout with full splitting and merging.
+ * - Verifies that the heap returns to a fully coalesced state after deallocation.
+ * - Suitable for systems where the allocator must manage memory from arbitrary external buffers.
  *
  *  Created on: May 20, 2025
  *      Author: newenclave
  *  
  */
-
-
 
 
 #include "aikartos/kernel/config.hpp"

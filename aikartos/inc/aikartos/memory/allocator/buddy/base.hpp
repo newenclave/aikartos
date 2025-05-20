@@ -337,5 +337,4 @@ namespace aikartos::memory::allocator::buddy {
 
 	};
 
-
 }

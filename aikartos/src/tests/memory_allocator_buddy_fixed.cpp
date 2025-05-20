@@ -1,13 +1,18 @@
-/*
- * mem_alloc_buddy.cpp
+/**
+ * @file tests/memory_allocator_buddy_fixed.cpp
+ * @brief Fixed buddy allocator test with internal static free list table.
+ *
+ * - Uses `buddy::impl::fixed` with a compile-time known maximum heap size.
+ * - Allocator metadata (free list table) is stored statically inside the object.
+ * - Works over an externally provided memory region for actual allocation.
+ * - Performs randomized allocation and deallocation (10,000 cycles).
+ * - Confirms deterministic layout, stability, and coalescing after free.
+ * - Ideal for embedded systems with strict layout and no dynamic memory.
  *
  *  Created on: May 20, 2025
  *      Author: newenclave
  *  
  */
-
-
-
 
 #include "aikartos/kernel/config.hpp"
 #include "aikartos/kernel/kernel.hpp"
