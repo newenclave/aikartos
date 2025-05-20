@@ -20,12 +20,15 @@
 //#define ENABLE_TEST_uart_blocking_write
 //#define ENABLE_TEST_producer_consumer
 
-//#define ENABLE_TEST_memory_allocation_free_list
-//#define ENABLE_TEST_memory_allocation_bump_list
-#define ENABLE_TEST_memory_allocation_dlist
-
 //#define ENABLE_TEST_sch_cfs_like
 //#define ENABLE_TEST_sch_mlfq
+
+//#define ENABLE_TEST_memory_allocation_free_list
+//#define ENABLE_TEST_memory_allocation_bump_list
+//#define ENABLE_TEST_memory_allocation_dlist
+
+//#define ENABLE_TEST_memory_allocator_buddy
+#define ENABLE_TEST_memory_allocator_buddy_fixed
 
 namespace tests {
 	constexpr std::uint32_t COUNT_SIZE = 5;
