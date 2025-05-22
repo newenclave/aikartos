@@ -87,7 +87,7 @@ namespace aikartos::kernel {
 		}
 
 		bool get_scheduler_statistic(sch::statistic_base &stat) override {
-			if constexpr (sch::has_get_statistic_method<scheduler_type>::value) {
+			if constexpr (sch::HasGetStatistic<scheduler_type>) {
 				return scheduler_.get_statistic(stat);
 			} else {
 				return false;

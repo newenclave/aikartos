@@ -49,6 +49,12 @@ namespace aikartos::sch {
 
 	};
 
+	template <typename SchT>
+	concept HasGetStatistic =  requires(SchT s, sch::statistic_base &stat_ref) {
+		{ s.get_statistic(stat_ref) };
+	};
+
+#if 0
 	template <typename T>
 	class has_get_statistic_method {
 	private:
@@ -62,5 +68,5 @@ namespace aikartos::sch {
 	public:
 	    static constexpr bool value = decltype(test<T>(0))::value;
 	};
-
+#endif
 }
