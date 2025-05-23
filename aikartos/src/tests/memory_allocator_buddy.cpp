@@ -7,7 +7,6 @@
  * - Performs randomized allocations and deallocations (10,000 cycles).
  * - Demonstrates dynamic memory layout with full splitting and merging.
  * - Verifies that the heap returns to a fully coalesced state after deallocation.
- * - Suitable for systems where the allocator must manage memory from arbitrary external buffers.
  *
  *  Created on: May 20, 2025
  *      Author: newenclave

@@ -1,17 +1,15 @@
 /**
- * @file tests/memory_allocator_buddy.cpp
- * @brief Buddy allocator test using in-place region-based memory.
+ * @file tests/memory_allocator_tlsf_fixed.cpp
+ * @brief TLSF allocator test using fixed-size internal metadata.
  *
- * - Initializes a `buddy::impl::region` allocator over a memory block allocated at runtime.
- * - All allocator metadata, including free list table, is placed inside the arena.
- * - Performs randomized allocations and deallocations (10,000 cycles).
- * - Demonstrates dynamic memory layout with full splitting and merging.
- * - Verifies that the heap returns to a fully coalesced state after deallocation.
- * - Suitable for systems where the allocator must manage memory from arbitrary external buffers.
+ * - Initializes a `tlsf::impl::fixed` allocator with statically defined heap size and index table.
+ * - All allocator metadata is stored internally in a compile-time sized `std::array`.
+ * - Performs randomized allocations and deallocations with high fragmentation potential.
+ * - Verifies correct handling of alignment, block splitting, and merging.
+ * - Demonstrates full recovery of heap space after complete deallocation.
  *
- *  Created on: May 20, 2025
+ *  Created on: May 23, 2025
  *      Author: newenclave
- *  
  */
 
 

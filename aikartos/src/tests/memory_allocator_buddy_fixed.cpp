@@ -7,7 +7,6 @@
  * - Works over an externally provided memory region for actual allocation.
  * - Performs randomized allocation and deallocation (10,000 cycles).
  * - Confirms deterministic layout, stability, and coalescing after free.
- * - Ideal for embedded systems with strict layout and no dynamic memory.
  *
  *  Created on: May 20, 2025
  *      Author: newenclave

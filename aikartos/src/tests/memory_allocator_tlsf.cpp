@@ -1,18 +1,17 @@
 /**
- * @file tests/memory_allocator_buddy.cpp
- * @brief Buddy allocator test using in-place region-based memory.
+ * @file tests/memory_allocator_tlsf.cpp
+ * @brief TLSF allocator test using in-place region-based memory.
  *
- * - Initializes a `buddy::impl::region` allocator over a memory block allocated at runtime.
- * - All allocator metadata, including free list table, is placed inside the arena.
- * - Performs randomized allocations and deallocations (10,000 cycles).
- * - Demonstrates dynamic memory layout with full splitting and merging.
- * - Verifies that the heap returns to a fully coalesced state after deallocation.
- * - Suitable for systems where the allocator must manage memory from arbitrary external buffers.
+ * - Initializes a `tlsf::impl::region` allocator over a contiguous memory block at runtime.
+ * - Allocator metadata (bucket index table) is stored inside the managed memory region.
+ * - Performs randomized allocations and deallocations with stress test conditions.
+ * - Demonstrates block splitting on allocation and full coalescing on free.
+ * - Validates allocator integrity and heap structure through visual inspection tools.
  *
- *  Created on: May 20, 2025
+ *  Created on: May 23, 2025
  *      Author: newenclave
- *  
  */
+
 
 
 #include "aikartos/kernel/config.hpp"
