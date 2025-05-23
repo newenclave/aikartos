@@ -38,8 +38,9 @@ namespace aikartos::memory {
 	void core::init_allocator() {
 		auto min_stack = reinterpret_cast<std::uintptr_t>(&_Min_Stack_Size);
 		auto begin_ptr = reinterpret_cast<std::uintptr_t>(&_end);
-		auto end_aptr = reinterpret_cast<std::uintptr_t>(&_estack) - min_stack;
-		instance_->init(begin_ptr, end_aptr);
+		auto end_ptr = reinterpret_cast<std::uintptr_t>(&_estack) - min_stack;
+
+		instance_->init(begin_ptr, end_ptr);
 	}
 }
 

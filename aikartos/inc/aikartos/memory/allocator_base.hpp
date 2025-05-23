@@ -23,7 +23,7 @@ namespace aikartos::memory {
 		virtual void *alloc(std::size_t size) = 0;
 		virtual void free(void *ptr) = 0;
 		virtual std::size_t total() const { return 0; }
-		virtual void dump_heap(printer_type print) const {  }
+		virtual void dump_heap(printer_type print) const = 0; //{  }
 		virtual void dump_info(printer_type print) const {  }
 	};
 }

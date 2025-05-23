@@ -21,7 +21,7 @@
 //#define ENABLE_TEST_producer_consumer
 
 //#define ENABLE_TEST_sch_cfs_like
-#define ENABLE_TEST_sch_mlfq
+//#define ENABLE_TEST_sch_mlfq
 
 //#define ENABLE_TEST_memory_allocation_free_list
 //#define ENABLE_TEST_memory_allocation_bump_list
@@ -29,6 +29,9 @@
 
 //#define ENABLE_TEST_memory_allocator_buddy
 //#define ENABLE_TEST_memory_allocator_buddy_fixed
+
+//#define ENABLE_TEST_memory_allocator_tlsf
+#define ENABLE_TEST_memory_allocator_tlsf_fixed
 
 namespace tests {
 	constexpr std::uint32_t COUNT_SIZE = 5;

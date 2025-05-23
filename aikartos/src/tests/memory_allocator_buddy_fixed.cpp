@@ -46,6 +46,7 @@ namespace tests {
 
 	constexpr std::size_t POINTERS_COUNT = 10'000;
 	constexpr std::size_t MAXIMUM_BLOCK = 1000;
+	void *allocated[POINTERS_COUNT];
 
 	int test::run(void)
 	{
@@ -75,8 +76,6 @@ namespace tests {
 		a.dump_heap(uart_printer);
 
 		rnd::xorshift32 rng(kernel::core::get_systick_val());
-
-		void *allocated[POINTERS_COUNT];
 
 		for(std::size_t i=0; i<POINTERS_COUNT; ++i) {
 			allocated[i] = a.alloc(rng.next() % MAXIMUM_BLOCK + 1);
