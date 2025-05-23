@@ -61,6 +61,8 @@ The project is written in **C++20**.
 | [`memory_allocator_dlist.cpp`](aikartos/src/tests/memory_allocator_dlist.cpp) | Demonstrates a double-linked free-list allocator with bidirectional coalescing and minimal overhead on allocation. |
 | [`memory_allocator_buddy.cpp`](aikartos/src/tests/memory_allocator_buddy.cpp) | Tests an arena-based buddy allocator (`buddy::impl::region`) that stores all metadata in external memory.|
 | [`memory_allocator_buddy_fixed.cpp`](aikartos/src/tests/memory_allocator_buddy_fixed.cpp) | Tests a statically bounded buddy allocator (`buddy::impl::fixed`) with internal free list table.         |
+| [`memory_allocator_tlsf.cpp`](aikartos/src/tests/memory_allocator_tlsf.cpp)         | Tests a dynamic TLSF allocator (`tlsf::impl::region`) that places bucket index tables inside the managed memory block. |
+| [`memory_allocator_tlsf_fixed.cpp`](aikartos/src/tests/memory_allocator_tlsf_fixed.cpp) | Tests a statically sized TLSF allocator (`tlsf::impl::fixed`) with a fully internalized index table stored in `std::array`. |
 
 ---
 
