@@ -12,7 +12,7 @@
 #include "aikartos/const/constants.hpp"
 #include "aikartos/device/device.hpp"
 
-namespace device {
+namespace aikartos::device {
 	class timebase {
 	public:
 		static void systick_init(std::uint32_t microseconds, std::uint32_t priority = 7) {

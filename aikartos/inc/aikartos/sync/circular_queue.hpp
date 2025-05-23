@@ -35,6 +35,13 @@ namespace aikartos::sync {
 			return true;
 		}
 
+		std::optional<element_type> try_get(std::size_t id) const {
+			if(id <= size()) {
+				return {items_[(tail_ + id) % queue_size] };
+			}
+			return {};
+		}
+
 		std::optional<element_type> try_pop() {
 			std::lock_guard<mutex_type> l(lock_);
 			if (head_ == tail_) {
@@ -55,6 +62,12 @@ namespace aikartos::sync {
 
 		std::size_t size() const {
 			return (head_ + queue_size - tail_) % queue_size;
+		}
+
+		void clear() {
+			std::lock_guard<mutex_type> l(lock_);
+			head_ = 0;
+			tail_ = 0;
 		}
 
 	private:

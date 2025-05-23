@@ -4,7 +4,7 @@
  *
  * - Each task has its own configurable time quantum.
  * - Tasks with quantum > 0 are preempted automatically when the quantum expires.
- * - Tasks with quantum == 0 are cooperative and run until they yield or block voluntarily.
+ * - Tasks with quantum == 0xFFFF'FFFF are cooperative and run until they yield or block voluntarily.
  * - The scheduler reads the active task’s quantum on every tick and resets the counter on context switch.
  *
  * This approach allows mixing real-time, cooperative tasks with preemptive ones, enabling precise control
