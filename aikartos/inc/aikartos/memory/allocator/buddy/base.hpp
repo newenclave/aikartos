@@ -31,10 +31,11 @@
 #include <bit>
 
 #include "aikartos/memory/allocator_base.hpp"
+#include "aikartos/utils/align_up.hpp"
 
 namespace aikartos::memory::allocator::buddy {
 
-	template <std::size_t MinimumLog2Order, std::size_t AlignValue>
+	template <std::size_t MinimumLog2Order, std::size_t Align>
 	class base {
 
 	public:
@@ -45,9 +46,9 @@ namespace aikartos::memory::allocator::buddy {
 		constexpr static std::size_t mininum_order = MinimumLog2Order;
 		static constexpr std::size_t maximum_order = sizeof(std::size_t) * CHAR_BIT - mininum_order;
 		constexpr static std::size_t minimum_value = 1u << mininum_order;
-		constexpr static std::size_t align_value = AlignValue;
+		constexpr static std::size_t alignment = Align;
 
-		struct alignas(align_value) block_header {
+		struct alignas(alignment) block_header {
 			std::size_t level_ = 0;
 			block_header* prev = nullptr;
 			block_header* next = nullptr;
@@ -222,11 +223,7 @@ namespace aikartos::memory::allocator::buddy {
 		}
 
 		constexpr static std::uintptr_t align_up(std::uintptr_t value) {
-			return align_up(value, align_value);
-		}
-
-		constexpr static std::uintptr_t align_up(std::uintptr_t value, std::size_t align) {
-			return (value + (align - 1)) & ~(align - 1);
+			return utils::align_up(value, alignment);
 		}
 
 		constexpr static std::size_t ceil_to_log2(std::size_t value) {

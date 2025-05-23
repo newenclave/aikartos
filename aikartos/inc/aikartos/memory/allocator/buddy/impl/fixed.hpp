@@ -24,7 +24,7 @@
 
 namespace aikartos::memory::allocator::buddy::impl {
 
-	template<std::size_t MemorySize, std::size_t MinimumLog2Order, std::size_t AlignValue>
+	template<std::size_t MaximumMemory, std::size_t MinimumLog2Order, std::size_t AlignValue>
 	class fixed: public memory::allocator_base {
 
 		using buddy_base = memory::allocator::buddy::base<MinimumLog2Order, AlignValue>;
@@ -32,15 +32,14 @@ namespace aikartos::memory::allocator::buddy::impl {
 	public:
 
 		static_assert(MinimumLog2Order >= 5, "A minimum value of 5 is required");
-		static_assert(MemorySize >= buddy_base::minimum_value, "The amount of memory requested is too small");
+		static_assert(MaximumMemory >= buddy_base::minimum_value, "The amount of memory requested is too small");
 
 		constexpr static std::size_t mininum_order = buddy_base::mininum_order;
-		constexpr static std::size_t memory_reuested = MemorySize;
-		constexpr static std::size_t maximum_value = std::size_t { 1 } << buddy_base::find_max_log2(memory_reuested);
-		constexpr static std::size_t maximum_level = buddy_base::find_max_log2(memory_reuested) - mininum_order + 1;
+		constexpr static std::size_t maximum_memory = MaximumMemory;
+		constexpr static std::size_t maximum_value = std::size_t { 1 } << buddy_base::find_max_log2(maximum_memory);
+		constexpr static std::size_t maximum_level = buddy_base::find_max_log2(maximum_memory) - mininum_order + 1;
 		constexpr static std::size_t minimum_value = buddy_base::minimum_value;
 		constexpr static std::size_t align_value = buddy_base::align_value;
-
 
 	private:
 

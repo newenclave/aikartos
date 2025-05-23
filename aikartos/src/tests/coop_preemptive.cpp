@@ -48,7 +48,7 @@ namespace {
 		 }
 	}
 
-	// This task has a quanta of 0, meaning it will run indefinitely without yielding or sleeping.
+	// This task has a quanta of 'infinite', meaning it will run indefinitely without yielding or sleeping.
 	void task3(void *) {
 		while(1){
 			for(int i=0; i<3'000'000; ++i) {
