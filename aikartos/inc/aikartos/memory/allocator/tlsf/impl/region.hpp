@@ -1,11 +1,26 @@
-/*
- * region.hpp
+/**
+ * @file memory/allocator/tlsf/region.hpp
+ * @brief Dynamic TLSF allocator that places bucket index table inside managed memory.
+ *
+ * - Dynamically reserves part of the managed memory region for internal metadata.
+ * - Automatically computes the optimal number of bucket classes based on region size.
+ * - Suitable for general-purpose heaps with flexible layout and runtime configuration.
+ * - Uses the core TLSF logic to perform allocation, freeing, splitting, and coalescing.
+ * - Does not require external state or static memory regions.
+ *
+ * Characteristics:
+ * - Designed for maximum flexibility and memory utilization.
+ * - Metadata and heap are colocated in a single memory block.
+ * - Safe bounds-checking during setup and allocation.
+ *
+ * Limitations:
+ * - Slightly reduced usable heap size due to inline index table.
+ * - Requires write access to entire managed region, including metadata area.
  *
  *  Created on: May 22, 2025
  *      Author: newenclave
  *  
  */
-
 
 #pragma once 
 

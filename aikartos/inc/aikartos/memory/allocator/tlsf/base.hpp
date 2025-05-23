@@ -1,11 +1,26 @@
-/*
- * base.hpp
+/**
+ * @file memory/allocator/tlsf/base.hpp
+ * @brief Core implementation of the Two-Level Segregated Fit (TLSF) memory allocator.
+ *
+ * - Provides the generic, reusable logic for TLSF-style memory management.
+ * - Implements two-level size class bucketing with fine-grained subclass separation.
+ * - Supports block splitting on allocation and bi-directional merging on free.
+ * - Uses compact block headers with physical linkage for fast merge operations.
+ * - Designed to be used by higher-level allocators (`tlsf::impl::region`, `tlsf::impl::fixed`)
+ *   which provide memory and index storage.
+ * - Independent of memory source: does not manage memory buffers directly.
+ * - Works with user-defined state objects that satisfy `StateConcept` and `IndicesAccessorConcept`.
+ * - Exposes static methods for allocation, deallocation, merging, splitting, and diagnostics.
+ *
+ * Limitations:
+ * - All allocation sizes are rounded up to the next aligned bucket size.
+ * - Coalescing occurs only when physically adjacent blocks are free.
+ * - Requires external storage for bucket index table and heap memory region.
  *
  *  Created on: May 22, 2025
  *      Author: newenclave
  *  
  */
-
 
 #pragma once 
 

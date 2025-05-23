@@ -1,5 +1,20 @@
-/*
- * fixed.hpp
+/**
+ * @file memory/allocator/tlsf/fixed.hpp
+ * @brief Fixed-capacity TLSF allocator with statically allocated bucket index table.
+ *
+ * - Stores all allocator metadata, including index tables, inside the allocator object.
+ * - Suitable for statically sized, pre-allocated memory regions.
+ * - Guarantees that no external memory is used for metadata at runtime.
+ * - Uses the core logic from `allocator_tlsf_base` to perform allocation and free operations.
+ * - Template parameters define maximum managed memory size and bucket configuration.
+ *
+ * Characteristics:
+ * - Ideal for systems with predictable memory needs and limited resources (e.g., embedded).
+ * - Fast access to index table via `std::array`, no dynamic memory overhead.
+s *
+ * Limitations:
+ * - Maximum memory size and class count are fixed at compile-time.
+ * - Slightly higher binary size due to embedded tables.
  *
  *  Created on: May 22, 2025
  *      Author: newenclave
