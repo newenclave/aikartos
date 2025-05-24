@@ -67,8 +67,8 @@ The project is written in **C++20**.
 
 ---
 
-## 🎮 Snake Demo
 <h2 id="snake-demo"></h2>
+## 🎮 Snake Demo
 
 [![Cooperative](https://img.shields.io/badge/Scheduler-Cooperative-blue)](#)
 
