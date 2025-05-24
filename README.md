@@ -21,7 +21,7 @@ The project is written in **C++20**.
 ## Table of Contents
 - [Features](#features)
 - [Examples](#examples)
-- [🎮 Snake Demo](#🎮-snake-demo)
+- [🎮 Snake Demo](#snake-demo)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
@@ -67,9 +67,11 @@ The project is written in **C++20**.
 
 ---
 
-## 🎮 Snake Demo
+## Snake Demo
 
 [![Cooperative](https://img.shields.io/badge/Scheduler-Cooperative-blue)](#)
+
+🎮🎮🎮
 
 <p align="center">
   <img src="video/the_snake_demo.gif" alt="AikaRTOS Snake Demo" width="480"/>
