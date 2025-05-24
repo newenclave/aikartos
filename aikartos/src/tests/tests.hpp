@@ -17,6 +17,7 @@
 //#define ENABLE_TEST_lottery
 //#define ENABLE_TEST_priority_aging
 //#define ENABLE_TEST_stack_overflow
+
 //#define ENABLE_TEST_uart_blocking_write
 //#define ENABLE_TEST_producer_consumer
 
@@ -30,13 +31,16 @@
 //#define ENABLE_TEST_memory_allocator_buddy
 //#define ENABLE_TEST_memory_allocator_buddy_fixed
 
-//#define ENABLE_TEST_memory_allocator_tlsf
+#define ENABLE_TEST_memory_allocator_tlsf
 //#define ENABLE_TEST_memory_allocator_tlsf_fixed
 
-// #define ENABLE_TEST_device_aurt_echo
-#define ENABLE_TEST_the_snake_
+//#define ENABLE_TEST_device_aurt_echo
+//#define ENABLE_TEST_the_snake_
+
+#include <atomic>
 
 namespace tests {
+
 	constexpr std::uint32_t COUNT_SIZE = 5;
 
 	struct test {
@@ -45,4 +49,4 @@ namespace tests {
 
 }
 
-extern std::uint32_t count[tests::COUNT_SIZE];
+extern std::atomic<std::uint32_t> count[tests::COUNT_SIZE];
