@@ -248,9 +248,8 @@ namespace {
 
 	private:
 
-
 		bool collides_with(const position_buffer &buffer, position pos) const {
-			for (std::size_t i = 0; i < length(); ++i) {
+			for (std::size_t i = 0; i < buffer.size(); ++i) {
 				if (get_buffer_element(buffer, i) == pos) {
 					return true;
 				}
@@ -402,7 +401,7 @@ namespace {
 
 					console::set_position(STATUS_LINE_X, 0);
 					console::set_color(COLOR_WHITE + COLOR_LIGHT);
-					device::uart::printf("  Score: %u  Length: %u  Alive: %s  ",
+					printer("  Score: %u  Length: %u  Alive: %s  ",
 						snake.score(),
 						snake.length(),
 						snake.alive() ? "Yes" : "No"
