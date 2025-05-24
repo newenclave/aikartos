@@ -10,11 +10,14 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
+#include <concepts>
 
 namespace aikartos::utils {
 
-	constexpr inline auto align_up(auto value, std::size_t align) {
+	template <typename T>
+	constexpr inline T align_up(T value, std::size_t align)
+		requires std::unsigned_integral<T>
+	{
 		return (value + (align - 1)) & ~(align - 1);
 	}
 }
