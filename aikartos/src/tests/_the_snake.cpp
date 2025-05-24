@@ -57,6 +57,7 @@ namespace {
 	constexpr char CHAR_FRUIT = '$';
 	constexpr char CHAR_PILL = '*';
 	constexpr char CHAR_DEAD = 'x';
+	constexpr char CHAR_WALL = '#';
 
 	constexpr std::uint32_t COLOR_GREEN = 33;
 	constexpr std::uint32_t COLOR_YELLOW = 32;
@@ -86,7 +87,7 @@ namespace {
 		right,
 	};
 
-	using body_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN>;
+	using position_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN>;
 	using changes_buffer = sync::circular_queue<change_info, MAXIMUM_BODY_LEN>;
 
 	struct console {
@@ -98,6 +99,16 @@ namespace {
 		}
 		static void clear() {
 			printer("\033[2J");
+		}
+		static void reset_color() {
+			printer("\033[0m");
+		}
+		static void hide_cursor() {
+			printer("\033[?25l");
+		}
+
+		static void show_cursor() {
+			printer("\033[?25h");
 		}
 	};
 
@@ -134,6 +145,10 @@ namespace {
 			pill_ = {pos};
 		}
 
+		void add_obstacle(position pos) {
+			obstacles_.try_push(pos);
+		}
+
 		bool has_fruit() const {
 			return fruit_.has_value() || pill_.has_value();
 		}
@@ -144,6 +159,14 @@ namespace {
 
 		void toggle_pause() {
 			is_paused_ = !is_paused_;
+		}
+
+		void increase_speed() {
+			delay_ -= 20;
+		}
+
+		void decrease_speed() {
+			delay_ += 20;
 		}
 
 		void reset() {
@@ -183,7 +206,8 @@ namespace {
 				case direction::right: new_head.x++;
 					break;
 				}
-				if(is_inside(new_head) && !collides_with_self(new_head)) {
+				const bool collides = collides_with_self(new_head) || collides_with_obstacle(new_head);
+				if(is_inside(new_head) && !collides) {
 					body_.try_push(new_head);
 					changes_.try_push(change_info{ .pos = head, .value = CHAR_BODY, .color_code = COLOR_YELLOW } );
 					changes_.try_push(change_info{ .pos = new_head, .value = CHAR_HEAD, .color_code = COLOR_GREEN } );
@@ -215,15 +239,31 @@ namespace {
 		}
 
 		bool collides_with_self(position pos) const {
+			return collides_with(body_, pos);
+		}
+
+		bool collides_with_obstacle(position pos) const {
+			return collides_with(obstacles_, pos);
+		}
+
+	private:
+
+
+		bool collides_with(const position_buffer &buffer, position pos) const {
 			for (std::size_t i = 0; i < length(); ++i) {
-				if (get_body_element(i) == pos) {
+				if (get_buffer_element(buffer, i) == pos) {
 					return true;
 				}
 			}
 			return false;
 		}
 
-	private:
+		position get_buffer_element(const position_buffer &buffer, std::size_t id) const {
+			if(auto pos = buffer.try_get(id) ) {
+				return *pos;
+			}
+			return {};
+		}
 
 		void spawn() {
 			auto start_x = rng_.next() % SNAKE_FIELD_WIDTH;
@@ -256,6 +296,13 @@ namespace {
 			return {};
 		}
 
+		position get_obstacle_element(std::size_t id) const {
+			if(auto pos = obstacles_.try_get(id) ) {
+				return *pos;
+			}
+			return {};
+		}
+
 		void pop_tail(std::size_t count) {
 			while(count--) {
 				if(length() == 1) {
@@ -283,7 +330,6 @@ namespace {
 			return false;
 		}
 
-
 		std::uint32_t score_ = 0;
 		bool is_alive_ = true;
 		bool is_paused_ = false;
@@ -292,7 +338,8 @@ namespace {
 		std::size_t delay_ = 300;
 		rnd::xorshift32 rng_;
 		direction curr_dir_ = direction::up;
-		body_buffer body_;
+		position_buffer body_;
+		position_buffer obstacles_;
 		changes_buffer changes_;
 
 	};
@@ -326,11 +373,13 @@ namespace {
 		};
 
 		void update_game_state(void *) {
+			auto &changes = snake.get_changes();
 			while(1) {
-				if(!snake.paused()) {
+				if(changes.empty() && !snake.paused()) {
 					snake.update();
 					kernel::sleep(snake.get_delay());
 				}
+				kernel::yield();
 			}
 		}
 
@@ -363,7 +412,7 @@ namespace {
 			}
 		}
 
-		void generate_fruit(void *) {
+		void generate_fruit_and_obstacle(void *) {
 			rnd::xorshift32 rng;
 			auto &changes = snake.get_changes();
 			while(1) {
@@ -373,8 +422,11 @@ namespace {
 					do {
 						pos.x = rng.next() % SNAKE_FIELD_WIDTH;
 						pos.y = rng.next() % SNAKE_FIELD_HEIGHT;
-					} while(snake.collides_with_self(pos));
-					if(fruit_pill < 20) {
+					} while(snake.collides_with_self(pos) || snake.collides_with_obstacle(pos));
+					if(fruit_pill < 10) {
+						snake.add_obstacle(pos);
+						changes.try_push(change_info{.pos = pos, .value = CHAR_WALL, .color_code = COLOR_WHITE + COLOR_LIGHT });
+					} else if(fruit_pill < 30) {
 						snake.set_pill(pos);
 						changes.try_push(change_info{.pos = pos, .value = CHAR_PILL, .color_code = COLOR_GREEN });
 					}
@@ -406,6 +458,12 @@ namespace {
 					case 'p':
 						snake.toggle_pause();
 						break;
+					case '1':
+						snake.increase_speed();
+						break;
+					case '2':
+						snake.decrease_speed();
+						break;
 					}
 				}
 				kernel::yield();
@@ -423,12 +481,13 @@ namespace tests {
 		kernel::init<sch_ns::scheduler, config>();
 		device::uart::init_rxtx(false);
 
+		console::hide_cursor();
 		draw_field(FIELD_WIDTH, FIELD_HEIGHT);
 
-		kernel::add_task(&workers::update_game_state);
+		kernel::add_task(&workers::generate_fruit_and_obstacle);
 		kernel::add_task(&workers::draw_game);
 		kernel::add_task(&workers::read_command);
-		kernel::add_task(&workers::generate_fruit);
+		kernel::add_task(&workers::update_game_state);
 
 		kernel::launch(constants::quanta_infinite);
 		PANIC("Should not be here");

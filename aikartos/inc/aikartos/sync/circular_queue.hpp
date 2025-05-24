@@ -64,6 +64,10 @@ namespace aikartos::sync {
 			return (head_ + queue_size - tail_) % queue_size;
 		}
 
+		bool empty() const {
+			return 0 == size();
+		}
+
 		void clear() {
 			std::lock_guard<mutex_type> l(lock_);
 			head_ = 0;
