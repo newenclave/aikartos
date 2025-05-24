@@ -11,6 +11,7 @@
 #include "aikartos/kernel/panic.hpp"
 #include "aikartos/sch/scheduler_round_robin.hpp"
 #include "aikartos/device/uart.hpp"
+#include "aikartos/device/device.hpp"
 
 #include "tests.hpp"
 
@@ -29,12 +30,13 @@ namespace {
 	void reader_task(void *)
 	{
 		 while(1){
-			 auto b = device::uart::blocking_read<kernel_yielder>();
-			 if(b == '\n' || b == '\r') {
-				 device::uart::printf("\r\n");
-			 }
-			 else {
-				 device::uart::printf("%c", b);
+			 if(auto b = device::uart::try_read()) {
+				 if(*b == '\n' || *b == '\r') {
+					 device::uart::printf("\r\n");
+				 }
+				 else {
+					 device::uart::printf("%c", *b);
+				 }
 			 }
 			 count[0]++;
 		 }
@@ -63,6 +65,8 @@ namespace tests {
 		namespace sch_ns = sch::round_robin;
 		kernel::init<sch_ns::scheduler, config>();
 		device::uart::init_rxtx(true);
+
+		device::uart::blocking_write("Hello!\r\n", 8);
 
 		kernel::add_task(&reader_task);
 		kernel::add_task(&task1);

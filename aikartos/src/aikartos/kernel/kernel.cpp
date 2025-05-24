@@ -14,27 +14,37 @@ namespace aikartos::kernel {
 
 		static void systick_handler() {
 			kernel::core::tick_count_ += 1;
-			static std::uint32_t counter = 0;
-			static std::uint32_t quanta = core::get_quanta();
-			std::uint32_t current_quanta = core::get_quanta();
+			static volatile std::uint32_t counter = 0;
+			static volatile std::uint32_t quanta = core::get_quanta();
 
+#if 0
+			counter += 1;
+			if((constants::quanta_infinite != quanta) && (counter >= quanta)) {
+				counter = 0;
+				SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+			}
+#else
+			volatile std::uint32_t current_quanta = core::get_quanta();
 			if(auto *hook = kernel::core::get_systick_hook()) {
 				if(hook(kernel::core::get_systick_hook_parameter())) {
 					counter = 0;
 					SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 				}
 			}
-			else {
+			else
+			{
 				if(current_quanta != quanta) {
 					quanta = current_quanta;
 					counter = 0;
 				}
 
-				if((constants::quanta_infinite != quanta) && (++counter >= quanta)) {
+				counter += 1;
+				if((constants::quanta_infinite != quanta) && (counter >= quanta)) {
 					counter = 0;
 					SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 				}
 			}
+#endif
 		}
 
 		static void pendsv_handler() {
@@ -130,7 +140,7 @@ extern "C" {
 		// Re-enable interrupts
 		asm volatile ("CPSIE   I");
 
-		// Return from interrupt — remaining registers restored automatically (R0–R3, R12, LR, PC, xPSR)
+		// Return from interrupt - remaining registers restored automatically (R0–R3, R12, LR, PC, xPSR)
 		asm volatile ("BX      LR");
 	}
 #endif

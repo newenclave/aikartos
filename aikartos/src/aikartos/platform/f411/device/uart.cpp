@@ -13,7 +13,7 @@
 
 namespace aikartos::device {
 
-#if 1 //def PLATFORM_f411_CORE
+#ifdef PLATFORM_f411_CORE
 
 	struct handler_friend {
 		static void uart_irq_handler() {
@@ -108,7 +108,7 @@ namespace aikartos::device {
 
 		USART2->CR1 = 0;
 
-		uart::set_baud_rate(constants::system_clock_frequency, constants::default_baud_rate);
+		uart::set_baud_rate(constants::uart_clock_frequency, constants::default_baud_rate);
 
 		USART2->CR1 |= USART_CR1_RE_Msk | USART_CR1_TE_Msk | (use_rx_irq ? USART_CR1_RXNEIE_Msk : 0);
 		USART2->CR1 |= USART_CR1_UE_Msk;
