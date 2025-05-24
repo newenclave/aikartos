@@ -80,6 +80,8 @@ The project is written in **C++20**.
 A tiny cooperative Snake game demo running on AikaRTOS.
 Implements movement via timer-driven tasks, showcasing clean task switching and input handling.
 
+[`the_snake.cpp`](aikartos/src/tests/_the_snake.cpp)
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
