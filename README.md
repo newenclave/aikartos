@@ -14,13 +14,14 @@ It is designed to explore basic task management, task scheduling, and memory all
 
 The project is written in **C++20**.
 
-> **Note:** This is a purely educational project.  
-> It was developed using a NUCLEO-F411RE board for experimentation purposes.  
+> **Note:** This is a purely educational project. 
+> It was developed using a NUCLEO-F411RE board for experimentation purposes.
 > Compatibility with other devices has not been tested.
 
 ## Table of Contents
 - [Features](#features)
 - [Examples](#examples)
+- [🎮 Snake Demo](#snake-demo)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
@@ -66,6 +67,17 @@ The project is written in **C++20**.
 
 ---
 
+## 🎮 Snake Demo
+
+[![Cooperative](https://img.shields.io/badge/Scheduler-Cooperative-blue)](#)
+
+<p align="center">
+  <img src="video/the_snake_demo.gif" alt="AikaRTOS Snake Demo" width="480"/>
+</p>
+
+A tiny cooperative Snake game demo running on AikaRTOS.
+Implements movement via timer-driven tasks, showcasing clean task switching and input handling.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
@@ -77,8 +89,8 @@ This project is licensed under the [MIT License](LICENSE).
 To build and run this project, you will need:
 
 - **ARM toolchain** (e.g., `arm-none-eabi-gcc`)
-- **STM32Cube Firmware Package for STM32F4**  
-  This includes the necessary device headers like `<stm32f4xx.h>` and HAL/LL drivers.  
+- **STM32Cube Firmware Package for STM32F4** 
+  This includes the necessary device headers like `<stm32f4xx.h>` and HAL/LL drivers.
   You can download it via:
   - [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html)
   - [STM32CubeF4 Package](https://www.st.com/en/embedded-software/stm32cubef4.html)

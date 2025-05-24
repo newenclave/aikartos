@@ -2,7 +2,7 @@
  * @file tests/the_snake.cpp
  * @brief Snake game demo for a custom RTOS running on STM32 (UART + ANSI terminal).
  *
- * This is a demonstration of building a simple interactive game on top of a cooperative or preemptive RTOS.
+ * This is a demonstration of building a simple interactive game on top of a cooperative RTOS.
  * It uses UART as input/output and displays everything via ANSI escape codes in a VT100-compatible terminal
  * (e.g., TeraTerm or minicom). The architecture is modular, with each game component running as an independent task.
  *
@@ -10,7 +10,7 @@
  * - Real-time input handling via UART (WASD + R to restart).
  * - Efficient partial screen rendering using a change queue.
  * - Snake body stored in a custom circular queue (no dynamic memory allocation).
- * - ANSI color output, fruit generation, scoring, game over state, and auto-restart.
+ * - ANSI color output, fruit generation, scoring, game over state.
  * - Modular structure: tasks for update, draw, input, and fruit generation.
  *
  * This example demonstrates UART-based user interaction, minimal game logic, and real multitasking behavior
@@ -85,8 +85,6 @@ namespace {
 
 	using body_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN>;
 	using changes_buffer = sync::circular_queue<change_info, MAXIMUM_BODY_LEN>;
-
-	changes_buffer changes;
 
 	class the_snake {
 	public:
@@ -173,6 +171,7 @@ namespace {
 			auto start_y = rng_.next() % SNAKE_FIELD_HEIGHT;
 			auto start_dir = rng_.next() % 4;
 			body_.try_push({start_x, start_y});
+			changes_.try_push(change_info{.pos = {start_x, start_y}, .value = CHAR_HEAD, .color_code = COLOR_GREEN });
 			curr_dir_ = static_cast<direction>(start_dir);
 		}
 
@@ -217,8 +216,8 @@ namespace {
 					body_.try_push(new_head);
 					const bool fruit_taken = (fruit_ && new_head == *fruit_);
 					const bool pill_taken = (pill_ && new_head == *pill_);
-					changes.try_push(change_info{ .pos = head, .value = CHAR_BODY, .color_code = COLOR_YELLOW } );
-					changes.try_push(change_info{ .pos = new_head, .value = CHAR_HEAD, .color_code = COLOR_GREEN } );
+					changes_.try_push(change_info{ .pos = head, .value = CHAR_BODY, .color_code = COLOR_YELLOW } );
+					changes_.try_push(change_info{ .pos = new_head, .value = CHAR_HEAD, .color_code = COLOR_GREEN } );
 
 					if(fruit_taken) {
 						fruit_ = {};
@@ -236,16 +235,20 @@ namespace {
 						}
 						while(pops--) {
 							if(auto tail = body_.try_pop()) {
-								changes.try_push(change_info{ .pos = *tail, .value = ' ' } );
+								changes_.try_push(change_info{ .pos = *tail, .value = ' ' } );
 							}
 						}
 					}
 				}
 				else {
 					is_alive_ = false;
-					changes.try_push(change_info{ .pos = head, .value = CHAR_DEAD, .color_code = COLOR_BLUE } );
+					changes_.try_push(change_info{ .pos = head, .value = CHAR_DEAD, .color_code = COLOR_BLUE } );
 				}
 			}
+		}
+
+		changes_buffer &get_changes() {
+			return changes_;
 		}
 
 	private:
@@ -258,6 +261,8 @@ namespace {
 		rnd::xorshift32 rng_;
 		direction curr_dir_ = direction::up;
 		body_buffer body_;
+		changes_buffer changes_;
+
 	};
 
 	the_snake snake;
@@ -294,6 +299,7 @@ namespace {
 		}
 
 		void drawer(void *) {
+			auto &changes = snake.get_changes();
 			while(1) {
 				bool changed = false;
 				while(auto c = changes.try_pop()) {
@@ -318,6 +324,7 @@ namespace {
 
 		void fruit(void *) {
 			rnd::xorshift32 rng;
+			auto &changes = snake.get_changes();
 			while(1) {
 				if(!snake.has_fruit()) {
 					auto fruit_pill = rng.next() % 100;
@@ -376,7 +383,6 @@ namespace tests {
 		device::uart::init_rxtx(false);
 
 		draw_field(FIELD_WIDTH, FIELD_HEIGHT);
-		//draw(snake);
 
 		kernel::add_task(&workers::updater);
 		kernel::add_task(&workers::drawer);
