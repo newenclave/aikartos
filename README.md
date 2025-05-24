@@ -15,8 +15,8 @@ It is designed to explore basic task management, task scheduling, and memory all
 The project is written in **C++20**.
 
 > **Note:** This is a purely educational project. 
-> It was developed using a NUCLEO-F411RE board for experimentation purposes.
-> Compatibility with other devices has not been tested.
+> It was originally developed using a NUCLEO-F411RE board for experimentation purposes.
+> Recently tested and confirmed to run on NUCLEO-H753ZI as well, though full multi-platform support is still a work in progress.
 
 ## Table of Contents
 - [Features](#features)
@@ -34,7 +34,7 @@ The project is written in **C++20**.
 - Multiple scheduler implementations (e.g., Round-Robin, Fixed Priority)
 - Simple memory allocator implementations (e.g., bump, free list)
 - Simple startup sequence
-- Designed for STM32 Cortex-M4 MCUs
+- Designed for STM32 Cortex-M4/M7 (tested on F411RE and H753ZI)
 - Written in C++20
 
 ---
