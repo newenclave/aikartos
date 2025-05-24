@@ -63,6 +63,9 @@ namespace {
 	constexpr std::uint32_t COLOR_WHITE = 37;
 	constexpr std::uint32_t COLOR_BLUE = 34;
 	constexpr std::uint32_t COLOR_RED = 91;
+	constexpr std::uint32_t COLOR_LIGHT = 60;
+
+	const auto printer = device::uart::printf;
 
 	struct position {
 		std::size_t x = 0;
@@ -86,26 +89,23 @@ namespace {
 	using body_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN>;
 	using changes_buffer = sync::circular_queue<change_info, MAXIMUM_BODY_LEN>;
 
+	struct console {
+		static void set_position(std::size_t x, std::size_t y) {
+			printer("\033[%u;%uH", y + 1, x + 1);
+		}
+		static void set_color(std::uint32_t code) {
+			printer("\033[%um", code);
+		}
+		static void clear() {
+			printer("\033[2J");
+		}
+	};
+
 	class the_snake {
 	public:
 
 		the_snake() {
 			spawn();
-		}
-
-		bool is_opposite(direction new_dir) {
-			switch (curr_dir_) {
-			case direction::up: return new_dir == direction::down;
-			case direction::down: return new_dir == direction::up;
-			case direction::left: return new_dir == direction::right;
-			case direction::right: return new_dir == direction::left;
-			default: return false;
-			}
-		}
-
-		static bool is_inside(position p) {
-			return p.x >= 0 && p.x < SNAKE_FIELD_WIDTH &&
-			       p.y >= 0 && p.y < SNAKE_FIELD_HEIGHT;
 		}
 
 		void set_direction(direction dir) {
@@ -118,23 +118,12 @@ namespace {
 			return curr_dir_;
 		}
 
-		std::size_t size() const {
+		std::size_t length() const {
 			return body_.size();
-		}
-
-		position get_body_element(std::size_t id) const {
-			if(auto pos = body_.try_get(id) ) {
-				return *pos;
-			}
-			return {};
 		}
 
 		std::size_t get_delay() const {
 			return delay_;
-		}
-
-		void set_delay(std::size_t val) {
-			delay_ = val;
 		}
 
 		void set_fruit(position pos) {
@@ -149,30 +138,12 @@ namespace {
 			return fruit_.has_value() || pill_.has_value();
 		}
 
-		bool collides_with_self(position pos) const {
-			for (std::size_t i = 0; i < size(); ++i) {
-				if (get_body_element(i) == pos) {
-					return true;
-				}
-			}
-			return false;
-		}
-
 		bool paused() const {
 			return is_paused_;
 		}
 
 		void toggle_pause() {
 			is_paused_ = !is_paused_;
-		}
-
-		void spawn() {
-			auto start_x = rng_.next() % SNAKE_FIELD_WIDTH;
-			auto start_y = rng_.next() % SNAKE_FIELD_HEIGHT;
-			auto start_dir = rng_.next() % 4;
-			body_.try_push({start_x, start_y});
-			changes_.try_push(change_info{.pos = {start_x, start_y}, .value = CHAR_HEAD, .color_code = COLOR_GREEN });
-			curr_dir_ = static_cast<direction>(start_dir);
 		}
 
 		void reset() {
@@ -195,7 +166,7 @@ namespace {
 		}
 
 		void update() {
-			const auto len = size();
+			const auto len = length();
 			if(!is_alive_) {
 				return;
 			}
@@ -214,30 +185,22 @@ namespace {
 				}
 				if(is_inside(new_head) && !collides_with_self(new_head)) {
 					body_.try_push(new_head);
-					const bool fruit_taken = (fruit_ && new_head == *fruit_);
-					const bool pill_taken = (pill_ && new_head == *pill_);
 					changes_.try_push(change_info{ .pos = head, .value = CHAR_BODY, .color_code = COLOR_YELLOW } );
 					changes_.try_push(change_info{ .pos = new_head, .value = CHAR_HEAD, .color_code = COLOR_GREEN } );
 
-					if(fruit_taken) {
-						fruit_ = {};
+					if(fruit_taken(new_head)) {
 						score_++;
 						if(delay_ > 50) {
 							delay_ -= 10;
 						}
 					} else {
 						std::size_t pops = 1;
-						if(pill_taken) {
-							pill_ = {};
+						if(pill_taken(new_head)) {
 							pops += 2;
 							score_++;
 							delay_ += 10;
 						}
-						while(pops--) {
-							if(auto tail = body_.try_pop()) {
-								changes_.try_push(change_info{ .pos = *tail, .value = ' ' } );
-							}
-						}
+						pop_tail(pops);
 					}
 				}
 				else {
@@ -251,7 +214,76 @@ namespace {
 			return changes_;
 		}
 
+		bool collides_with_self(position pos) const {
+			for (std::size_t i = 0; i < length(); ++i) {
+				if (get_body_element(i) == pos) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 	private:
+
+		void spawn() {
+			auto start_x = rng_.next() % SNAKE_FIELD_WIDTH;
+			auto start_y = rng_.next() % SNAKE_FIELD_HEIGHT;
+			auto start_dir = rng_.next() % 4;
+			body_.try_push({start_x, start_y});
+			changes_.try_push(change_info{.pos = {start_x, start_y}, .value = CHAR_HEAD, .color_code = COLOR_GREEN });
+			curr_dir_ = static_cast<direction>(start_dir);
+		}
+
+		bool is_opposite(direction new_dir) const {
+			switch (curr_dir_) {
+			case direction::up: return new_dir == direction::down;
+			case direction::down: return new_dir == direction::up;
+			case direction::left: return new_dir == direction::right;
+			case direction::right: return new_dir == direction::left;
+			default: return false;
+			}
+		}
+
+		static bool is_inside(position p) {
+			return p.x >= 0 && p.x < SNAKE_FIELD_WIDTH &&
+			       p.y >= 0 && p.y < SNAKE_FIELD_HEIGHT;
+		}
+
+		position get_body_element(std::size_t id) const {
+			if(auto pos = body_.try_get(id) ) {
+				return *pos;
+			}
+			return {};
+		}
+
+		void pop_tail(std::size_t count) {
+			while(count--) {
+				if(length() == 1) {
+					break;
+				}
+				if(auto tail = body_.try_pop()) {
+					changes_.try_push(change_info{ .pos = *tail, .value = ' ' } );
+				}
+			}
+		}
+
+		bool pill_taken(position new_head) {
+			return obj_taken(pill_, new_head);
+		}
+
+		bool fruit_taken(position new_head) {
+			return obj_taken(fruit_, new_head);
+		}
+
+		bool obj_taken(std::optional<position> &obj, position new_head) {
+			if(obj && new_head == *obj) {
+				obj = {};
+				return true;
+			}
+			return false;
+		}
+
+
 		std::uint32_t score_ = 0;
 		bool is_alive_ = true;
 		bool is_paused_ = false;
@@ -268,16 +300,20 @@ namespace {
 	the_snake snake;
 
 	void draw_field(std::size_t width, std::size_t height) {
-		device::uart::printf("\033[2J");  // cls
-		device::uart::printf("\033[37m"); // reset attributes
-		for (std::size_t x = 1; x <= width; ++x) {
-			device::uart::printf("\033[1;%uH#", x);
-			device::uart::printf("\033[%u;%uH#", height, x);
+		console::clear();
+		console::set_color(COLOR_WHITE + COLOR_LIGHT);
+		for (std::size_t x = 0; x < width; ++x) {
+			console::set_position(x, 0);
+			printer("#");
+			console::set_position(x, height - 1);
+			printer("#");
 		}
 
-		for (std::size_t y = 2; y < height; ++y) {
-			device::uart::printf("\033[%u;1H#", y);
-			device::uart::printf("\033[%u;%uH#", y, width);
+		for (std::size_t y = 0; y < height; ++y) {
+			console::set_position(0, y);
+			printer("#");
+			console::set_position(width - 1, y);
+			printer("#");
 		}
 	}
 
@@ -289,7 +325,7 @@ namespace {
 			}
 		};
 
-		void updater(void *) {
+		void update_game_state(void *) {
 			while(1) {
 				if(!snake.paused()) {
 					snake.update();
@@ -298,23 +334,28 @@ namespace {
 			}
 		}
 
-		void drawer(void *) {
+		void draw_game(void *) {
 			auto &changes = snake.get_changes();
 			while(1) {
 				bool changed = false;
 				while(auto c = changes.try_pop()) {
-					device::uart::printf("\033[%u;%uH\033[%um%c", c->pos.y + 2, c->pos.x + 2, c->color_code, c->value);
+					console::set_position(c->pos.x + 1, c->pos.y + 1);
+					console::set_color(c->color_code);
+					printer("%c", c->value);
 					changed = true;
 				}
 				if(changed) {
 					if(!snake.alive()) {
-						device::uart::printf("\033[%u;%uH  GAME OVER  ",
-							FIELD_HEIGHT / 2, FIELD_WIDTH / 2 - 5);
+						console::set_position(FIELD_WIDTH / 2 - 5, FIELD_HEIGHT / 2);
+						console::set_color(COLOR_BLUE);
+						printer("GAME OVER");
 					}
-					device::uart::printf("\033[%u;%uH\033[37m  Score: %u  Length: %u  Alive: %s  ",
-						1, STATUS_LINE_X,
+
+					console::set_position(STATUS_LINE_X, 0);
+					console::set_color(COLOR_WHITE + COLOR_LIGHT);
+					device::uart::printf("  Score: %u  Length: %u  Alive: %s  ",
 						snake.score(),
-						snake.size(),
+						snake.length(),
 						snake.alive() ? "Yes" : "No"
 					);
 				}
@@ -322,7 +363,7 @@ namespace {
 			}
 		}
 
-		void fruit(void *) {
+		void generate_fruit(void *) {
 			rnd::xorshift32 rng;
 			auto &changes = snake.get_changes();
 			while(1) {
@@ -333,7 +374,7 @@ namespace {
 						pos.x = rng.next() % SNAKE_FIELD_WIDTH;
 						pos.y = rng.next() % SNAKE_FIELD_HEIGHT;
 					} while(snake.collides_with_self(pos));
-					if(fruit_pill < 10) {
+					if(fruit_pill < 20) {
 						snake.set_pill(pos);
 						changes.try_push(change_info{.pos = pos, .value = CHAR_PILL, .color_code = COLOR_GREEN });
 					}
@@ -384,10 +425,10 @@ namespace tests {
 
 		draw_field(FIELD_WIDTH, FIELD_HEIGHT);
 
-		kernel::add_task(&workers::updater);
-		kernel::add_task(&workers::drawer);
+		kernel::add_task(&workers::update_game_state);
+		kernel::add_task(&workers::draw_game);
 		kernel::add_task(&workers::read_command);
-		kernel::add_task(&workers::fruit);
+		kernel::add_task(&workers::generate_fruit);
 
 		kernel::launch(constants::quanta_infinite);
 		PANIC("Should not be here");
