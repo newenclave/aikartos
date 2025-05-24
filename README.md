@@ -8,7 +8,7 @@
 [![Made for STM32](https://img.shields.io/badge/Platform-STM32-blue.svg)](#)
 [![Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-orange)](#)
 
-AikaRTOS is a simple educational RTOS project targeting the STM32 NUCLEO-F411RE board.
+AikaRTOS is a simple educational RTOS project originally targeting the STM32 NUCLEO-F411RE board, now also tested on the NUCLEO-H753ZI.
 
 It is designed to explore basic task management, task scheduling, and memory allocation on embedded systems.
 
