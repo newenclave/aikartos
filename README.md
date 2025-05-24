@@ -21,7 +21,7 @@ The project is written in **C++20**.
 ## Table of Contents
 - [Features](#features)
 - [Examples](#examples)
-- [🎮 Snake Demo](#snake-demo)
+- [🎮 Snake Demo](#🎮-snake-demo)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
