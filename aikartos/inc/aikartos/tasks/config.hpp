@@ -13,12 +13,6 @@
 
 namespace aikartos::tasks {
 
-	enum class priority_class: std::uint8_t {
-		HIGH = 0,
-		MEDIUM = 1,
-		LOW = 2,
-	};
-
 	using config = utils::flagged_storage<16>;
 
 }

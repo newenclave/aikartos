@@ -124,7 +124,7 @@ namespace aikartos::device {
 		}
 	}
 
-	inline bool uart::tx_ready() {
+	bool uart::tx_ready() {
 		return (USART3->ISR & USART_ISR_TXE_TXFNF);
 	}
 

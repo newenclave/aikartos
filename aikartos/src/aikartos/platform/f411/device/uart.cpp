@@ -114,6 +114,7 @@ namespace aikartos::device {
 		USART2->CR1 |= USART_CR1_UE_Msk;
 		if(use_rx_irq) {
 			uart::irq_used = true;
+			NVIC_SetPriority(USART2_IRQn, 14);
 			NVIC_EnableIRQ(USART2_IRQn);
 		}
 	}
@@ -138,7 +139,7 @@ namespace aikartos::device {
 		}
 	}
 
-	inline bool uart::tx_ready() {
+	bool uart::tx_ready() {
 		return (USART2->SR & USART_SR_TXE);
 	}
 

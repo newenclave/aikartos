@@ -57,6 +57,13 @@ defined in linker script */
 Reset_Handler:
   ldr   r0, =_estack
   mov   sp, r0          /* set stack pointer */
+
+/* Reset table
+  ldr   r0, =g_pfnVectors
+  ldr   r1, =0xE000ED08   /* SCB->VTOR
+  str   r0, [r1]
+*/
+
 /* Call the clock system initialization function.*/
   bl  SystemInit
 
