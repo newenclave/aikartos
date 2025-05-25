@@ -57,8 +57,6 @@ namespace tests {
 
 	int test::run(void)
 	{
-		SCB_DisableICache();
-		//SCB_DisableDCache();
 
 		using config = kernel::config;
 		namespace sch_ns = sch::round_robin;
