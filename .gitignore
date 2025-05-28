@@ -7,6 +7,9 @@
 # Build artifacts
 **/Debug/
 **/Release/
+**/Debug-*/
+**/Release-*/
+
 **/.vscode/**
 *.elf
 *.bin
@@ -18,3 +21,7 @@
 # Backup and autosave files
 *~
 *.swp
+
+CMakeCache.txt
+CMakeFiles/*
+

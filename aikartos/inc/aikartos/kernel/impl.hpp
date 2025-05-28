@@ -118,7 +118,8 @@ namespace aikartos::kernel {
 
 			tcb.push<std::uint32_t>(xPSR_T_Msk); // 0x01000000
 			tcb.push<std::uint32_t>(task);
-			tcb.push<std::uint32_t>(0x14141414);  //R14
+			tcb.push<std::uint32_t>(0xFFFFFFFD);  //LR
+			//tcb.push<std::uint32_t>(0x14141414);  //R14
 			tcb.push<std::uint32_t>(0x12121212);  //R12
 			tcb.push<std::uint32_t>(0x03030303);  //R3
 			tcb.push<std::uint32_t>(0x02020202);  //R2
