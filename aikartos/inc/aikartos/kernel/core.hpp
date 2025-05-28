@@ -10,6 +10,7 @@
 #include <atomic>
 #include <cstdint>
 
+#include "aikartos/platform/platform.hpp"
 #include "aikartos/const/constants.hpp"
 #include "aikartos/device/timebase.hpp"
 #include "aikartos/kernel/api.hpp"
@@ -114,11 +115,45 @@ namespace aikartos::kernel {
 
 		static void add_task(task_entry task, const tasks::config &config, task_parameter parameter = nullptr);
 
+		constexpr static bool has_fpu() {
+#if defined(AIKARTOS_ENABLE_FPU)
+			return true;
+#endif
+			return false;
+		}
+
+		static inline bool enable_fpu_hardware() {
+			if constexpr (core::has_fpu()) {
+				SCB->CPACR |= ((3UL << 10*2) |	// CP10 Full Access
+				               (3UL << 11*2));	// CP11 Full Access
+
+				// allow autosave and lazy stack
+				FPU->FPCCR |= (FPU_FPCCR_ASPEN_Msk | FPU_FPCCR_LSPEN_Msk);
+
+				__DSB();
+				__ISB();
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+#if defined(AIKARTOS_ENABLE_FPU)
+		static inline void set_task_fpu_default(bool value) {
+			impl_base::set_task_fpu_default(value);
+		}
+		static inline bool get_task_fpu_default() {
+			return impl_base::get_task_fpu_default();
+		}
+#endif
+
 	private:
 
 		static void init_first_task();
 
 		friend struct handlers_friend;
+
 		inline static volatile std::uint32_t tick_count_ = 0;
 		inline static impl_base *instance_ = nullptr;
 	};

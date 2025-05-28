@@ -6,13 +6,15 @@
  */
 
 #pragma once
-#include "aikartos/sync/policies/mutex_policy.hpp"
-#include "aikartos/sync/spin_lock.hpp"
+
 #include <array>
 #include <mutex>
 #include <cstdint>
 #include <atomic>
 #include <optional>
+
+#include "aikartos/sync/policies/mutex_policy.hpp"
+#include "aikartos/sync/spin_lock.hpp"
 
 
 namespace aikartos::sync {
@@ -66,6 +68,10 @@ namespace aikartos::sync {
 
 		bool empty() const {
 			return 0 == size();
+		}
+
+		bool full() const {
+			return ((head_ + 1) % queue_size) == tail_;
 		}
 
 		void clear() {

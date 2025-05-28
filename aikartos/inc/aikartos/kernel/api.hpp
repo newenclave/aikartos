@@ -46,6 +46,22 @@ namespace aikartos::kernel {
 		    return ipsr != 0;
 		}
 
+		static void enable_fpu(task_block *task) {
+#if defined(AIKARTOS_ENABLE_FPU)
+			task->enable_fpu();
+	    	__set_CONTROL(__get_CONTROL() | CONTROL_FPCA_Msk);
+	    	__ISB();
+#endif
+		}
+
+		static void disable_fpu(task_block *task) {
+#if defined(AIKARTOS_ENABLE_FPU)
+			task->disable_fpu();
+	    	__set_CONTROL(__get_CONTROL() & ~CONTROL_FPCA_Msk);
+	    	__ISB();
+#endif
+		}
+
 		static task_block *get_current_tcb();
 	private:
 		static std::uint32_t get_tick_count();

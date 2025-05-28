@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "aikartos/platform/platform.hpp"
 #include "aikartos/kernel/impl_base.hpp"
 
 #include "aikartos/kernel/panic.hpp"
@@ -107,6 +108,11 @@ namespace aikartos::kernel {
 			auto tcb = kernel::api::get_current_tcb();
 			ASSERT(tcb, "No current TCB...");
 			if(tcb->task.task) {
+#if defined(AIKARTOS_ENABLE_FPU)
+				if(tcb->is_fpu_used()) {
+					kernel::api::enable_fpu(tcb);
+				}
+#endif
 				tcb->task.state = tasks::descriptor::state_type::RUNNING;
 				tcb->task.task(tcb->task.parameter);
 			}
@@ -116,6 +122,20 @@ namespace aikartos::kernel {
 
 		void task_object_staсk_init(control_block &tcb, int32_t task) {
 
+#if defined(AIKARTOS_ENABLE_FPU)
+			if(impl_base::get_task_fpu_default()) {
+				tcb.enable_fpu();
+			}
+#	ifdef DEBUG
+			tcb.push<std::uint32_t>(0xDEADBEEF); // deadbeef
+#	endif
+			tcb.push<std::uint32_t>(0xFA000000); // padding
+			tcb.push<std::uint32_t>(0xFB000000); // FPSCR
+
+			for(int i=0; i<16; ++i) {
+				tcb.push<std::uint32_t>(0xF0000000 + i);  //s0 - s15 registers
+			}
+#endif
 			tcb.push<std::uint32_t>(xPSR_T_Msk); // 0x01000000
 			tcb.push<std::uint32_t>(task);
 			tcb.push<std::uint32_t>(0xFFFFFFFD);  //LR
@@ -140,5 +160,6 @@ namespace aikartos::kernel {
 		inline static utils::object_pool<task_object, maximum_tasks> pool_;
 		inline static scheduler_type scheduler_;
 		inline static tasks::object<400> idle_;
+
 	};
 }
