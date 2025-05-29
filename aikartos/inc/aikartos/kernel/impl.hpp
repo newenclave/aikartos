@@ -49,6 +49,8 @@ namespace aikartos::kernel {
 
 	public:
 
+		~impl() noexcept = default;
+
 		impl() {
 			task_object_staсk_init(idle_.tcb, reinterpret_cast<std::uint32_t>(&impl::task_idle));
 		}

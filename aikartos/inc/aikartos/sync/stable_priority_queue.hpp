@@ -7,14 +7,15 @@
 
 #pragma once
 
-#include "aikartos/sync/policies/mutex_policy.hpp"
-#include "aikartos/sync/spin_lock.hpp"
 #include <optional>
 #include <cstdint>
 #include <array>
 #include <algorithm>
 #include <concepts>
 #include <functional>
+
+#include "aikartos/sync/policies/mutex_policy.hpp"
+#include "aikartos/sync/spin_lock.hpp"
 
 namespace aikartos::sync {
 	template <typename T,

@@ -60,7 +60,7 @@ Reset_Handler:
 
 /* Reset table
   ldr   r0, =g_pfnVectors
-  ldr   r1, =0xE000ED08   /* SCB->VTOR
+  ldr   r1, =0xE000ED08   // SCB->VTOR
   str   r0, [r1]
 */
 

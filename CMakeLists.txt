@@ -6,8 +6,7 @@ if(NOT DEFINED PLATFORM)
   message(FATAL_ERROR "Use -DPLATFORM=f411 or -DPLATFORM=h753")
 endif()
 
-
-# C:\soft\ST\STM32Cube_FW_F4\STM32Cube_FW_F4_V1.28.0\Drivers
+# ST\STM32Cube_FW_F4\STM32Cube_FW_F4_V1.28.0\Drivers/CMSIS
 if(NOT DEFINED CMSIS_DIRECTORY)
   set(CMSIS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS")
   message(STATUS "CMSIS_DIRECTORY not defined, using default: ${CMSIS_DIRECTORY}")
@@ -38,21 +37,22 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 
-
 add_compile_options(
   -mcpu=${MCPU}
   -mthumb
-  -Wall -Wextra -Wno-unused-parameter
+  -Wall -Wextra -Wno-unused-parameter -Wdouble-promotion
   -fno-exceptions
   -fno-rtti
-  -fdata-sections -ffunction-sections
+  -fdata-sections
+  -fno-threadsafe-statics
   -std=gnu++20
   -mfpu=fpv4-sp-d16 -mfloat-abi=hard
   -ffunction-sections 
   -fno-use-cxa-atexit 
   -fstack-usage 
-  -fcyclomatic-complexity 
-  --specs=nano.specs
+  -fcyclomatic-complexity
+  -U_GLIBCXX_HAS_GTHREADS
+  --specs=nano.specs 
   ${PLATFORM_DEFINES}
 )
 
@@ -68,16 +68,43 @@ file(GLOB_RECURSE SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/memory/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/${PLATFORM}/device/*.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/${PLATFORM}/startup/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/${PLATFORM}/startup/*.c
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/sys/*.c
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/tests/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/*.cpp
 )
 
-add_executable(aikartos.elf ${SOURCES})
+file(GLOB STARTUP_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/${PLATFORM}/startup/*.s
+)
+
+set_source_files_properties(${STARTUP_SOURCES}
+  PROPERTIES LANGUAGE ASM
+)
+
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -x assembler-with-cpp -mcpu=${MCPU} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard"
+)
+
+add_executable(aikartos.elf
+  ${SOURCES}
+  ${STARTUP_SOURCES}
+)
 
 target_link_options(aikartos.elf PRIVATE
+  -mcpu=cortex-m4 
   -T${LINKER_SCRIPT}
-  -nostdlib -Wl,--gc-sections
+  -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/aikartos.map 
+  -Wl,--gc-sections 
+  -lstdc++_nano
+  -static 
+  --specs=nano.specs 
+  -mfpu=fpv4-sp-d16 
+  -mfloat-abi=hard 
+  -mthumb 
+  -Wl,--start-group 
+  -lc -lm 
+  -lstdc++ 
+  -lsupc++ 
+  -Wl,--end-group
 )
 
 add_custom_command(TARGET aikartos.elf POST_BUILD
