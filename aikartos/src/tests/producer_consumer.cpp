@@ -6,9 +6,6 @@
  *  
  */
 
-#include <stdio.h>
-#include <mutex>
-
 #include "aikartos/device/uart.hpp"
 #include "aikartos/kernel/config.hpp"
 #include "aikartos/kernel/kernel.hpp"
@@ -17,6 +14,7 @@
 #include "aikartos/sync/circular_queue.hpp"
 #include "aikartos/sync/spin_lock.hpp"
 #include "aikartos/sync/spin_conditional_variable.hpp"
+#include "aikartos/sync/lock_guarg.hpp"
 
 #include "tests.hpp"
 

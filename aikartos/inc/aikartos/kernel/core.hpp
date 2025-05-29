@@ -116,7 +116,7 @@ namespace aikartos::kernel {
 		static void add_task(task_entry task, const tasks::config &config, task_parameter parameter = nullptr);
 
 		constexpr static bool has_fpu() {
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU) & PLATFORM_FPU_AVAILABLE
 			return true;
 #endif
 			return false;
@@ -139,7 +139,7 @@ namespace aikartos::kernel {
 			}
 		}
 
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 		static inline void set_task_fpu_default(bool value) {
 			impl_base::set_task_fpu_default(value);
 		}

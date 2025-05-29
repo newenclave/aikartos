@@ -46,16 +46,16 @@ namespace aikartos::kernel {
 		    return ipsr != 0;
 		}
 
-		static void enable_fpu(task_block *task) {
-#if defined(AIKARTOS_ENABLE_FPU)
+		static void enable_fpu_for_task(task_block *task) {
+#if defined(PLATFORM_USE_FPU)
 			task->enable_fpu();
 	    	__set_CONTROL(__get_CONTROL() | CONTROL_FPCA_Msk);
 	    	__ISB();
 #endif
 		}
 
-		static void disable_fpu(task_block *task) {
-#if defined(AIKARTOS_ENABLE_FPU)
+		static void disable_fpu_for_task(task_block *task) {
+#if defined(PLATFORM_USE_FPU)
 			task->disable_fpu();
 	    	__set_CONTROL(__get_CONTROL() & ~CONTROL_FPCA_Msk);
 	    	__ISB();

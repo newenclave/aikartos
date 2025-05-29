@@ -108,9 +108,9 @@ namespace aikartos::kernel {
 			auto tcb = kernel::api::get_current_tcb();
 			ASSERT(tcb, "No current TCB...");
 			if(tcb->task.task) {
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 				if(tcb->is_fpu_used()) {
-					kernel::api::enable_fpu(tcb);
+					kernel::api::enable_fpu_for_task(tcb);
 				}
 #endif
 				tcb->task.state = tasks::descriptor::state_type::RUNNING;
@@ -122,7 +122,7 @@ namespace aikartos::kernel {
 
 		void task_object_staсk_init(control_block &tcb, int32_t task) {
 
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 			if(impl_base::get_task_fpu_default()) {
 				tcb.enable_fpu();
 			}

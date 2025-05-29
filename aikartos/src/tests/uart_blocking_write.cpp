@@ -7,7 +7,6 @@
  */
 
 #include <stdio.h>
-#include <mutex>
 
 #include "aikartos/device/uart.hpp"
 #include "aikartos/kernel/config.hpp"
@@ -15,6 +14,7 @@
 #include "aikartos/kernel/panic.hpp"
 #include "aikartos/sch/scheduler_round_robin.hpp"
 #include "aikartos/sync/spin_lock.hpp"
+#include "aikartos/sync/lock_guarg.hpp"
 
 #include "tests.hpp"
 

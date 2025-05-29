@@ -100,15 +100,58 @@ extern "C" {
 		aikartos::kernel::handlers_friend::systick_handler();
 	}
 
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
+/*
+ * Pseudo-code for PendSV_Handler (implemented in assembly):
+ *
+ *{
+ *	disable_irq();
+ *
+ *	// Save current task context
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::use_fpu) {
+ *		store(PSP, {s16–s31});
+ *		// remember we store registers for this task
+ *		g_current_tcb_ptr->flags |= tasks::task_flags::fpu_saved;
+ *	}
+ *	store(PSP, {R4–R11});
+ *	g_current_tcb_ptr->stack = PSP;
+ *
+ *	// Perform context switch (updates g_current_tcb_ptr)
+ *	pendsv_handler_impl();
+ *
+ *	// Now g_current_tcb_ptr points to the next task
+ *
+ *	// Restore context of the new task
+ *	restore(g_current_tcb_ptr->stack, {R4–R11});
+ *
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::use_fpu) {
+ *		result = 0xFFFFFFED; // Return with FPU frame
+ *	} else {
+ *		result = 0xFFFFFFFD; // Return without FPU frame
+ *	}
+ *
+ *	// Restore FPU context if previously saved
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::fpu_saved) {
+ *		restore(g_current_tcb_ptr->stack, {s16–s31});
+ *	}
+ *
+ *	PSP = g_current_tcb_ptr->stack;
+ *
+ *	enable_irq();
+ *
+ *	return result; // Written to LR
+ *
+ *}
+ *
+ **/
 	extern "C" __attribute__((naked)) void PendSV_Handler(void) {
 		__asm volatile ("CPSID   I");
 
 		// Save current task context: read PSP
 		asm volatile ("MRS     R0, PSP");
 		asm volatile ("LDR     R1, =g_current_tcb_ptr");
-		asm volatile ("LDR     R2, [R1]");
-		asm volatile ("LDR     R3, [R2, #4]");
+		asm volatile ("LDR     R2, [R1]"); 	   // R2 = g_current_tcb_ptr
+		asm volatile ("LDR     R3, [R2, #4]"); // R3 = g_current_tcb_ptr->flags
 
 		asm volatile ("TST     R3, #(1 << 0)"); // if(flags & tasks::task_flags::use_fpu)
 		asm volatile ("BEQ     no_fpu_use");
@@ -139,10 +182,10 @@ extern "C" {
 		// New task...
 		// Load new current_tcb_ptr after switch
 		asm volatile ("LDR     R1, =g_current_tcb_ptr");
-		asm volatile ("LDR     R2, [R1]");
+		asm volatile ("LDR     R2, [R1]"); // R2 = g_current_tcb_ptr
 
 		// Load new task's saved stack pointer
-		asm volatile ("LDR     R0, [R2, #0]");
+		asm volatile ("LDR     R0, [R2, #0]"); // R0 = g_current_tcb_ptr->stack
 
 		// Restore callee-saved registers for new task
 		asm volatile ("LDMIA   R0!, {R4-R11}");
@@ -164,7 +207,7 @@ extern "C" {
 		// FPCA = 0
 		//	    asm volatile ("MOVW    LR, #0xFFFD");
 		//	    asm volatile ("MOVT    LR, #0xFFFF");
-		asm volatile ("LDR     LR, =0xFFFFFFFD"); //EXC_RETURN with FPU
+		asm volatile ("LDR     LR, =0xFFFFFFFD"); //EXC_RETURN with NO FPU
 
 	asm volatile ("done_fpca :");
 		/******/

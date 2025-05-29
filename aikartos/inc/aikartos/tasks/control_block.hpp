@@ -14,7 +14,7 @@
 namespace aikartos::tasks {
 
 	enum class task_flags: std::uint32_t {
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 		use_fpu = (1u << 0),
 		fpu_saved = (1u << 1),
 #endif
@@ -24,7 +24,7 @@ namespace aikartos::tasks {
 
 		std::uintptr_t stack = 0;
 
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 		std::uint32_t flags = 0;
 		inline bool is_fpu_used() const {
 			return flags & static_cast<std::uint32_t>(task_flags::use_fpu);

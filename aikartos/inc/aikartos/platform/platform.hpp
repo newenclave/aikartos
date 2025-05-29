@@ -15,7 +15,9 @@ extern "C" char g_pfnVectors;
 
 #if defined(PLATFORM_USE_FPU)
 #	if defined (__FPU_PRESENT) && (__FPU_PRESENT == 1)
-#		define AIKARTOS_ENABLE_FPU 1
+#		define PLATFORM_FPU_AVAILABLE 1
+#	else
+#		warning "This platform doesn't support FPU."
 #	endif
 #endif
 

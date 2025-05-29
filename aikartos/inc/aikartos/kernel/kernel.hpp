@@ -43,7 +43,7 @@ namespace aikartos::kernel {
 	inline bool has_fpu() { return core::has_fpu(); }
 	inline auto enable_fpu_hardware() { return core::enable_fpu_hardware(); }
 
-#if defined(AIKARTOS_ENABLE_FPU)
+#if defined(PLATFORM_USE_FPU)
 		inline void set_task_fpu_default(bool value) { core::set_task_fpu_default(value); }
 		inline bool get_task_fpu_default() { return core::get_task_fpu_default(); }
 #endif

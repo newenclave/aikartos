@@ -15,15 +15,19 @@ endif()
 
 if(PLATFORM STREQUAL "f411")
   set(MCPU "cortex-m4")
-  set(PLATFORM_DEFINES "-DSTM32F411xE -DPLATFORM_f411_CORE")
-  set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/aikartos/platform/f411/linker/link_flash.ld")
+  set(CMSIS_DEVICE_NAME "F4")
+  set(PLATFORM_DEFINES -DSTM32F411xE -DPLATFORM_f411_CORE)
+  set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/f411/linker/link_flash.ld")
 elseif(PLATFORM STREQUAL "h753")
+  set(CMSIS_DEVICE_NAME "H7")
   set(MCPU "cortex-m7")
-  set(PLATFORM_DEFINES "-DSTM32H753xx -DPLATFORM_h753_CORE")
+  set(PLATFORM_DEFINES -DSTM32H753xx -DPLATFORM_h753_CORE)
   set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/aikartos/src/aikartos/platform/h753/linker/link_flash.ld")
 else()
   message(FATAL_ERROR "Unknown PLATFORM: ${PLATFORM}")
 endif()
+
+message("CMSIS_DEVICE_NAME == ${CMSIS_DEVICE_NAME}")
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
@@ -39,10 +43,16 @@ add_compile_options(
   -mcpu=${MCPU}
   -mthumb
   -Wall -Wextra -Wno-unused-parameter
-  -ffreestanding
   -fno-exceptions
   -fno-rtti
   -fdata-sections -ffunction-sections
+  -std=gnu++20
+  -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+  -ffunction-sections 
+  -fno-use-cxa-atexit 
+  -fstack-usage 
+  -fcyclomatic-complexity 
+  --specs=nano.specs
   ${PLATFORM_DEFINES}
 )
 
@@ -50,7 +60,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/aikartos/inc
   ${CMAKE_CURRENT_SOURCE_DIR}/platform/${PLATFORM}
   ${CMSIS_DIRECTORY}/Include
-  ${CMSIS_DIRECTORY}/Device/ST/STM32${PLATFORM}xx/Include
+  ${CMSIS_DIRECTORY}/Device/ST/STM32${CMSIS_DEVICE_NAME}xx/Include
 )
 
 file(GLOB_RECURSE SOURCES
