@@ -69,7 +69,7 @@ The project is written in **C++20**.
 
 ## Snake Demo
 
-[![Cooperative](https://img.shields.io/badge/Scheduler-Cooperative-blue)](#)
+[![Preemptive](https://img.shields.io/badge/Scheduler-Cooperative-blue)](#)
 
 🎮🎮🎮
 
@@ -81,6 +81,20 @@ A tiny cooperative Snake game demo running on AikaRTOS.
 Implements movement via timer-driven tasks, showcasing clean task switching and input handling.
 
 [`the_snake.cpp`](aikartos/src/tests/_the_snake.cpp)
+
+## FPU demo
+
+[![Preemptive](https://img.shields.io/badge/Scheduler-Round--robin-blue)](#)
+
+<p align="center">
+  <img src="video/FPU_demo_01.gif" alt="FPU demo" width="480"/>
+</p>
+
+A small floating-point demo with smooth motion and fading trail.
+Uses trigonometric FPU math and per-frame task updates to draw a glowing animated path in the console.
+Demonstrates how one task can safely use the FPU while others do not, under a preemptive round-robin scheduler.
+
+[`fpu_demo_01.cpp`](aikartos/src/tests/fpu_demo_01.cpp)
 
 ## License
 
