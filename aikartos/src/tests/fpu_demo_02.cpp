@@ -28,7 +28,7 @@ using namespace aikartos;
 namespace {
 
 	const auto printer = device::uart::printf<32>;
-	tests::console<decltype(printer)> term = { .printer = printer };
+	tests::terminal<decltype(printer)> term { printer };
 
 	constexpr int WIDTH = 80;
 	constexpr int HEIGHT = 25;
@@ -76,7 +76,7 @@ namespace {
 			}
 
 			// get current time
-			std::time_t now_sec = current_sec++;
+			std::uint32_t now_sec = current_sec++;
 
 			std::uint32_t sec_value = (now_sec % 60);
 			std::uint32_t min_value = (now_sec / 60) % 60;

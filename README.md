@@ -23,6 +23,7 @@ The project is written in **C++20**.
 - [Examples](#examples)
 - [🎮 Snake Demo](#snake-demo)
 - [FPU demo](#fpu-demo)
+- [FPU demo 3](#fpu-demo-3)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
@@ -96,6 +97,15 @@ Uses trigonometric FPU math and per-frame task updates to draw a glowing animate
 Demonstrates how one task can safely use the FPU while others do not, under a preemptive round-robin scheduler.
 
 [`fpu_demo_01.cpp`](aikartos/src/tests/fpu_demo_01.cpp)
+
+
+## FPU demo 3
+
+<p align="center">
+  <img src="video/FPU_demo_03.gif" alt="FPU demo" width="200"/>
+</p>
+
+[`fpu_demo_03.cpp`](aikartos/src/tests/fpu_demo_03.cpp)
 
 ## License
 

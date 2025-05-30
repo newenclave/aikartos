@@ -6,9 +6,7 @@
  *  
  */
 
-
 #pragma once 
-
 
 namespace tests {
 	template<typename PrintT>
@@ -18,6 +16,9 @@ namespace tests {
 
 		terminal(PrintT p): printer(p) {};
 
+		void cursor_to_top() {
+		    printer("\033[H");
+		}
 		void set_position(std::size_t x, std::size_t y) {
 			printer("\033[%u;%uH", y + 1, x + 1);
 		}

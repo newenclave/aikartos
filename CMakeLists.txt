@@ -101,24 +101,19 @@ target_link_libraries(aikartos.elf
 )
 
 target_link_options(aikartos.elf PRIVATE
-  -mcpu=cortex-m4 
-#  -nostartfiles
-  -nodefaultlibs
-  -T${LINKER_SCRIPT}
-  -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/aikartos.map 
-  -Wl,--gc-sections 
-  #-lstdc++_nano
-  -static 
-  --specs=nano.specs 
-  -mfpu=fpv4-sp-d16 
-  -mfloat-abi=hard 
-  -mthumb 
-  -Wl,--start-group 
-  -lc -lm 
-  -lstdc++ 
-  -lsupc++ 
-  -lgcc 
-  -Wl,--end-group
+    -mcpu=cortex-m4 
+    -T${LINKER_SCRIPT}
+    -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/aikartos.map
+    -Wl,--gc-sections 
+        -nodefaultlibs 
+        -static 
+        --specs=nano.specs 
+        -mfpu=fpv4-sp-d16 
+        -mfloat-abi=hard 
+        -mthumb 
+    -Wl,--start-group 
+        -lc -lm -lstdc++ -lsupc++ 
+    -Wl,--end-group
 )
 
 add_custom_command(TARGET aikartos.elf POST_BUILD

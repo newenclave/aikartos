@@ -6,8 +6,7 @@
 std::uint32_t count[tests::COUNT_SIZE] = {};
 //std::atomic<std::uint32_t> count[tests::COUNT_SIZE] = {};
 
-//extern "C" void _init() {}
-//extern "C" __attribute((weak)) void _init() {}
+extern "C" __attribute((weak)) void _init() {}
 //extern "C" __attribute((weak)) void _fini() {}
 
 int main() {
