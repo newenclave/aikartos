@@ -12,8 +12,12 @@
 
 namespace tests {
 	template<typename PrintT>
-	struct console {
+	struct terminal {
+
 		PrintT printer;
+
+		terminal(PrintT p): printer(p) {};
+
 		void set_position(std::size_t x, std::size_t y) {
 			printer("\033[%u;%uH", y + 1, x + 1);
 		}

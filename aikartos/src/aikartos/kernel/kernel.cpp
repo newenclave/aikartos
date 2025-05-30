@@ -110,7 +110,7 @@ extern "C" {
  *	// Save current task context
  *	if (g_current_tcb_ptr->flags & tasks::task_flags::use_fpu) {
  *		store(PSP, {s16–s31});
- *		// remember we store registers for this task
+ *		// remember: we store the registers for this task and will need to restore them
  *		g_current_tcb_ptr->flags |= tasks::task_flags::fpu_saved;
  *	}
  *	store(PSP, {R4–R11});

@@ -18,8 +18,8 @@
 #include "aikartos/rnd/xorshift32.hpp"
 #include "aikartos/sync/circular_queue.hpp"
 
+#include "terminal.hpp"
 #include "tests.hpp"
-#include "console.hpp"
 
 using namespace aikartos;
 

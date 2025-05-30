@@ -18,8 +18,8 @@
 #include "aikartos/rnd/xorshift32.hpp"
 #include "aikartos/sync/circular_queue.hpp"
 
+#include "terminal.hpp"
 #include "tests.hpp"
-#include "console.hpp"
 
 using namespace aikartos;
 
@@ -37,8 +37,6 @@ namespace {
 	}
 
 	const auto printer = device::uart::printf<32>;
-
-	constexpr float sinus_wide = 30.0f;
 
 	void calc_sinus(void*) {
 		this_task::enable_fpu();
@@ -67,7 +65,7 @@ namespace {
 	void draw2(void*) {
 		this_task::enable_fpu();
 		rnd::xorshift32 rng(get_seed());
-		tests::console<decltype(printer)> con = { .printer = printer };
+		tests::terminal<decltype(printer)> con { printer };
 
 		constexpr int WIDTH = 80;
 		constexpr int HEIGHT = 25;
@@ -84,7 +82,7 @@ namespace {
 
 		con.clear();
 		while (true) {
-			float delta = ((rng.next() % 100) / 100.0f - 0.5f) * 3.9f;
+			float delta = ((rng.next() % 100) / 100.0f - 0.5f) * 1.3f;
 			angle += delta;
 
 			float dx = std::cos(angle);

@@ -22,6 +22,7 @@ The project is written in **C++20**.
 - [Features](#features)
 - [Examples](#examples)
 - [🎮 Snake Demo](#snake-demo)
+- [FPU demo](#fpu-demo)
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
