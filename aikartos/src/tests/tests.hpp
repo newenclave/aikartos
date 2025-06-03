@@ -35,7 +35,11 @@
 //#define ENABLE_TEST_memory_allocator_tlsf_fixed
 
 //#define ENABLE_TEST_device_aurt_echo
-#define ENABLE_TEST_the_snake_
+//#define ENABLE_TEST_the_snake_
+
+//#define ENABLE_TEST_FPU_demo_01
+#define ENABLE_TEST_FPU_demo_02
+//#define ENABLE_TEST_FPU_demo_03
 
 #include <atomic>
 
@@ -49,4 +53,5 @@ namespace tests {
 
 }
 
-extern std::atomic<std::uint32_t> count[tests::COUNT_SIZE];
+extern std::uint32_t count[tests::COUNT_SIZE];
+//extern std::atomic<std::uint32_t> count[tests::COUNT_SIZE];

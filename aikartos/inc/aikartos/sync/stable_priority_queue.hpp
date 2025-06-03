@@ -7,16 +7,15 @@
 
 #pragma once
 
-#include "aikartos/sync/policies/mutex_policy.hpp"
-#include "aikartos/sync/spin_lock.hpp"
 #include <optional>
 #include <cstdint>
 #include <array>
 #include <algorithm>
 #include <concepts>
 #include <functional>
-#include <mutex>
 
+#include "aikartos/sync/policies/mutex_policy.hpp"
+#include "aikartos/sync/spin_lock.hpp"
 
 namespace aikartos::sync {
 	template <typename T,
@@ -31,7 +30,7 @@ namespace aikartos::sync {
 		constexpr static std::size_t queue_size = QueueSize;
 
 		bool try_push(element_type value) {
-			std::lock_guard<mutex_type> l(lock_);
+			sync::lock_guard<mutex_type> l(lock_);
 			if (count_ == queue_size) {
 				return false;
 			}
@@ -41,7 +40,7 @@ namespace aikartos::sync {
 		}
 
 		std::optional<element_type> peek() {
-			std::lock_guard<mutex_type> l(lock_);
+			sync::lock_guard<mutex_type> l(lock_);
 			if (count_ == 0) {
 				return {};
 			}
@@ -49,7 +48,7 @@ namespace aikartos::sync {
 		}
 
 		std::optional<element_type> try_pop() {
-			std::lock_guard<mutex_type> l(lock_);
+			sync::lock_guard<mutex_type> l(lock_);
 			if (count_ == 0) {
 				return {};
 			}

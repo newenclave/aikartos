@@ -100,7 +100,138 @@ extern "C" {
 		aikartos::kernel::handlers_friend::systick_handler();
 	}
 
-#if 1
+#if defined(PLATFORM_USE_FPU)
+/*
+ * Pseudo-code for PendSV_Handler (implemented in assembly):
+ *
+ *{
+ *	disable_irq();
+ *
+ *	// Save current task context
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::use_fpu) {
+ *		store(PSP, {s16–s31});
+ *		// remember: we store the registers for this task and will need to restore them
+ *		g_current_tcb_ptr->flags |= tasks::task_flags::fpu_saved;
+ *	}
+ *	store(PSP, {R4–R11});
+ *	g_current_tcb_ptr->stack = PSP;
+ *
+ *	// Perform context switch (updates g_current_tcb_ptr)
+ *	pendsv_handler_impl();
+ *
+ *	// Now g_current_tcb_ptr points to the next task
+ *
+ *	// Restore context of the new task
+ *	restore(g_current_tcb_ptr->stack, {R4–R11});
+ *
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::use_fpu) {
+ *		result = 0xFFFFFFED; // Return with FPU frame
+ *	} else {
+ *		result = 0xFFFFFFFD; // Return without FPU frame
+ *	}
+ *
+ *	// Restore FPU context if previously saved
+ *	if (g_current_tcb_ptr->flags & tasks::task_flags::fpu_saved) {
+ *		restore(g_current_tcb_ptr->stack, {s16–s31});
+ *	}
+ *
+ *	PSP = g_current_tcb_ptr->stack;
+ *
+ *	enable_irq();
+ *
+ *	return result; // Written to LR
+ *
+ *}
+ *
+ **/
+	extern "C" __attribute__((naked)) void PendSV_Handler(void) {
+		__asm volatile ("CPSID   I");
+
+		// Save current task context: read PSP
+		asm volatile ("MRS     R0, PSP");
+		asm volatile ("LDR     R1, =g_current_tcb_ptr");
+		asm volatile ("LDR     R2, [R1]"); 	   // R2 = g_current_tcb_ptr
+		asm volatile ("LDR     R3, [R2, #4]"); // R3 = g_current_tcb_ptr->flags
+
+		asm volatile ("TST     R3, #(1 << 0)"); // if(flags & tasks::task_flags::use_fpu)
+		asm volatile ("BEQ     no_fpu_use");
+
+		asm volatile ("VSTMDB  R0!, { s16 - s31 }");
+
+		asm volatile ("ORR     R3, R3, #(1 << 1)"); // flags |= tasks::task_flags::fpu_saved
+		asm volatile ("STR     R3, [R2, #4]");
+		asm volatile ("B       no_fpu_use_final");
+
+		asm volatile ("no_fpu_use:");
+		asm volatile ("BIC     R3, R3, #(1 << 1)"); // flags &= ~tasks::task_flags::fpu_saved
+		asm volatile ("STR     R3, [R2, #4]");
+
+	asm volatile ("no_fpu_use_final:");
+
+		// Push callee-saved registers R4–R11 onto current task's stack
+		asm volatile ("STMDB   R0!, {R4-R11}");
+
+		// Save updated PSP into current TCB
+		asm volatile ("STR     R0, [R2]");
+
+		// Call C function to switch to next task
+		asm volatile ("PUSH    {LR}");
+		asm volatile ("BL      pendsv_handler_impl");
+		asm volatile ("POP     {LR}");
+
+		// New task...
+		// Load new current_tcb_ptr after switch
+		asm volatile ("LDR     R1, =g_current_tcb_ptr");
+		asm volatile ("LDR     R2, [R1]"); // R2 = g_current_tcb_ptr
+
+		// Load new task's saved stack pointer
+		asm volatile ("LDR     R0, [R2, #0]"); // R0 = g_current_tcb_ptr->stack
+
+		// Restore callee-saved registers for new task
+		asm volatile ("LDMIA   R0!, {R4-R11}");
+
+		asm volatile ("LDR     R3, [R2, #4]");  // R3 = g_current_tcb_ptr->flags
+
+		/******/
+		asm volatile ("TST     R3, #(1 << 0)"); //if (flags & tasks::task_flags::use_fpu)
+		asm volatile ("BEQ     not_using_fpu");
+
+		//; FPCA = 1
+		//	    asm volatile ("MOVW    LR, #0xFFED");
+		//	    asm volatile ("MOVT    LR, #0xFFFF");
+		asm volatile ("LDR     LR, =0xFFFFFFED"); //EXC_RETURN with FPU
+		asm volatile ("B       done_fpca");
+
+	asm volatile ("not_using_fpu:");
+
+		// FPCA = 0
+		//	    asm volatile ("MOVW    LR, #0xFFFD");
+		//	    asm volatile ("MOVT    LR, #0xFFFF");
+		asm volatile ("LDR     LR, =0xFFFFFFFD"); //EXC_RETURN with NO FPU
+
+	asm volatile ("done_fpca :");
+		/******/
+
+		asm volatile ("TST     R3, #(1 << 1)");     // if (flags & tasks::task_flags::fpu_saved)
+		asm volatile ("BEQ     no_fpu_saved");
+
+		// flags & TCB_FLAG_USE_FPU != 0
+		asm volatile ("VLDMIA  R0!, {s16-s31}");
+
+		// flags & TCB_FLAG_USE_FPU == 0
+	asm volatile ("no_fpu_saved:");
+
+		// Set PSP to point to new task's stack
+		asm volatile ("MSR     PSP, R0");
+
+		// Re-enable interrupts
+		asm volatile ("CPSIE   I");
+
+		// Return from interrupt - remaining registers restored automatically (R0–R3, R12, LR, PC, xPSR)
+		asm volatile ("BX      LR");
+	}
+
+#else
 	__attribute__((naked)) void PendSV_Handler() {
 		asm volatile ("CPSID   I");
 

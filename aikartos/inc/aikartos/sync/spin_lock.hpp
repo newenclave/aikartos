@@ -7,9 +7,10 @@
 
 #pragma once
 
+#include <atomic>
+
 #include "aikartos/sync/policies/no_yield.hpp"
 #include "aikartos/sync/policies/yield_policy.hpp"
-#include <atomic>
 
 namespace aikartos::sync {
 
