@@ -45,7 +45,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 512K
+  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 384K
+  MODULE  (rx)  : ORIGIN = 0x08060000, LENGTH = 128K
 }
 
 /* Sections */
@@ -183,5 +184,13 @@ SECTIONS
     libgcc.a ( * )
   }
 
+  .modules_begin 0x08060000 :
+  {
+    KEEP(*(.dummy_for_modules_begin))
+  } > MODULE
+  
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
+
+PROVIDE(_modules_begin = ORIGIN(MODULE));
+PROVIDE(_modules_end   = ORIGIN(MODULE) + LENGTH(MODULE));

@@ -38,8 +38,10 @@
 //#define ENABLE_TEST_the_snake_
 
 //#define ENABLE_TEST_FPU_demo_01
-#define ENABLE_TEST_FPU_demo_02
+//#define ENABLE_TEST_FPU_demo_02
 //#define ENABLE_TEST_FPU_demo_03
+
+#define ENABLE_TEST_modules_001
 
 #include <atomic>
 
