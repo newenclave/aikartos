@@ -3,7 +3,7 @@ import struct
 from elftools.elf.elffile import ELFFile
 import zlib
 
-HEADER_SIGNATURE = int.from_bytes(b'AIKA', byteorder='little')  # 'AIKA'
+HEADER_SIGNATURE = int.from_bytes(b'AIKM', byteorder='little')  # 'AIKa Module'
 HEADER_SIZE = 32  # 32 header
 ENTRY_OFFSET = 0x10  # default after header starts .text section
 
@@ -82,6 +82,7 @@ def main():
             text_size = text_section['sh_size']
             if args.verbose:
                 print(f"[*] .text section: addr={hex(text_section['sh_addr'])}, size={text_size} bytes")
+                
         data_section = elf.get_section_by_name('.data')
         if data_section:
             data_size = data_section['sh_size']

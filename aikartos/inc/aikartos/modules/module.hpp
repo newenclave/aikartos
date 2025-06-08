@@ -15,8 +15,10 @@ namespace aikartos::modules {
 	class module {
 	public:
 
+		constexpr static std::uint32_t default_sign = 0x4D4B4941; // AIKM
+
 		struct header {
-			std::uint32_t signature;	// 'AIKA' signature
+			std::uint32_t signature;	// 'AIKM' signature
 			std::uint32_t image_size;	// only bin payload
 			std::uint32_t entry_offset;	// payload offset
 			std::uint32_t crc32;		// crc32 header + description + all body
@@ -75,6 +77,11 @@ namespace aikartos::modules {
 		template<typename CallT>
 		CallT get_entry_point() const {
 			return reinterpret_cast<CallT>(load_addr_ | 1); // thumb interworking
+		}
+
+		static bool is_module_address(std::uintptr_t addr) {
+			const auto hdr = reinterpret_cast<const header *>(addr);
+			return hdr->signature == default_sign;
 		}
 
 	private:

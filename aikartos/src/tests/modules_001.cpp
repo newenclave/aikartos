@@ -17,6 +17,7 @@
 
 #include "aikartos/rnd/xorshift32.hpp"
 #include "aikartos/modules/module.hpp"
+#include "aikartos/modules/bundle.hpp"
 
 #include "tests.hpp"
 
@@ -57,15 +58,10 @@ namespace tests {
 
 		auto uart_printer = device::uart::printf<256>;
 
-		uint8_t* bin_data = (uint8_t*)&_modules_begin;
+		std::uintptr_t bin_data = reinterpret_cast<std::uintptr_t>(&_modules_begin);
 
-		modules::module test_m(reinterpret_cast<std::uintptr_t>(bin_data));
-		[[maybe_unused]] const bool crc_ok = test_m.check_crc32();
-		[[maybe_unused]] auto desc = test_m.get_description();
-
-		void* exec_memory = (void*)malloc(test_m.get_image_size());
-
-		test_m.load(reinterpret_cast<std::uintptr_t>(exec_memory));
+		[[maybe_unused]] const bool is_module = modules::module::is_module_address(bin_data);
+		[[maybe_unused]] const bool is_bundle = modules::bundle::is_bundle_address(bin_data);
 
 		module_param m1 = {
 			.name = "Module 1",
@@ -79,11 +75,41 @@ namespace tests {
 			.sleep = &kernel::sleep,
 		};
 
-		kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
-				(void *)&m1);
 
-		kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
-				(void *)&m2);
+		if(is_module) {
+			modules::module test_m(bin_data);
+			[[maybe_unused]] const bool crc_ok = test_m.check_crc32();
+			[[maybe_unused]] auto desc = test_m.get_description();
+
+			void* exec_memory = (void*)malloc(test_m.get_image_size());
+
+			test_m.load(reinterpret_cast<std::uintptr_t>(exec_memory));
+
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
+					(void *)&m1);
+
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
+					(void *)&m2);
+
+		}
+		else if(is_bundle) {
+			modules::bundle bdl { bin_data };
+			auto mod1 = bdl.get_module(0);
+			auto mod2 = bdl.get_module(1);
+
+			auto m1_entry = reinterpret_cast<std::uintptr_t>(malloc(mod1->get_image_size()));
+			auto m2_entry = reinterpret_cast<std::uintptr_t>(malloc(mod2->get_image_size()));
+
+			mod1->load(m1_entry);
+			mod2->load(m2_entry);
+
+			kernel::add_task(mod1->get_entry_point<tasks::control_block::task_entry>(), (void *)&m1);
+
+			kernel::add_task(mod2->get_entry_point<tasks::control_block::task_entry>(), (void *)&m2);
+
+		}
+
+
 
 		kernel::launch(10);
 		PANIC("Should not be here");

@@ -5,6 +5,9 @@ import random
 import string
 import subprocess
 
+HEADER_SIGNATURE = int.from_bytes(b'AIKB', byteorder='little')  # 'AIKa Bundle'
+HEADER_SIZE = 32  # 32 header
+
 def get_file_size(file_path):
     return os.path.getsize(file_path)
 
@@ -22,7 +25,7 @@ def make_bundle(output_path, modules):
         modules_count = len(modules)
 
         header_pos = out_file.tell()
-        out_file.write(b'\x00' * 16)  # 4 x uint32
+        out_file.write(b'\x00' * HEADER_SIZE)  # 8 x uint32
         out_file.write(b'\x00' * 4 * modules_count)
 
         module_offsets = []
@@ -44,7 +47,11 @@ def make_bundle(output_path, modules):
             current_offset += len(padded_data)
 
         out_file.seek(header_pos)
+        out_file.write(struct.pack('<I', HEADER_SIGNATURE))
         out_file.write(struct.pack('<I', modules_count))
+        out_file.write(struct.pack('<I', 0))  # reserved
+        out_file.write(struct.pack('<I', 0))  # reserved
+        out_file.write(struct.pack('<I', 0))  # reserved
         out_file.write(struct.pack('<I', 0))  # reserved
         out_file.write(struct.pack('<I', 0))  # reserved
         out_file.write(struct.pack('<I', 0))  # reserved
@@ -52,7 +59,7 @@ def make_bundle(output_path, modules):
         print(f"[+] Bundle created: {output_path}")
         print(f"[*] Module offsets:")
         for i, offset in enumerate(module_offsets):
-            out_file.seek(16 + i * 4) # 16 bytes for header + 4 bytes per module offset
+            out_file.seek(HEADER_SIZE + i * 4) # 16 bytes for header + 4 bytes per module offset
             out_file.write(struct.pack('<I', offset))
             print(f"     Module {i}: 0x{offset:08X}")
 
@@ -61,7 +68,7 @@ def main():
     parser.add_argument('-a', '--address', required=True, help='Start address (e.g., 0x80003000)')
     parser.add_argument('-o', '--output', default=None, help='Output bundle file (optional)')
     parser.add_argument('-m', '--module', action='append', required=True, help='Binary module file (.bin)')
-    parser.add_argument('--align', type=int, default=0x8, help='Align address to this value (default: 0x200)')
+    parser.add_argument('--align', type=int, default=0x8, help='Align address to this value (default: 0x8)')
     args = parser.parse_args()
 
     try:
