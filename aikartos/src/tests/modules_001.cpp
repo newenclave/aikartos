@@ -85,11 +85,9 @@ namespace tests {
 
 			test_m.load(reinterpret_cast<std::uintptr_t>(exec_memory));
 
-			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
-					(void *)&m1);
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m1);
 
-			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(),
-					(void *)&m2);
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m2);
 
 		}
 		else if(is_bundle) {
@@ -103,9 +101,9 @@ namespace tests {
 			mod1->load(m1_entry);
 			mod2->load(m2_entry);
 
-			kernel::add_task(mod1->get_entry_point<tasks::control_block::task_entry>(), (void *)&m1);
+			kernel::add_task(mod1->get_entry_point<tasks::control_block::task_entry>(), &m1);
 
-			kernel::add_task(mod2->get_entry_point<tasks::control_block::task_entry>(), (void *)&m2);
+			kernel::add_task(mod2->get_entry_point<tasks::control_block::task_entry>(), &m2);
 
 		}
 

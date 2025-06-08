@@ -42,6 +42,10 @@ def main():
         print("[*] Processing...")
 
     description = args.description.encode('utf-8')
+    if len(description) > 32:
+        print("[!] Description is too long, must be 32 bytes or less.")
+        description = description[:31] 
+        
     if len(description) > 0:
         description = description + b'\x00'
 

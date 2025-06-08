@@ -15,7 +15,6 @@
  * Limitations:
  * - All allocation sizes are rounded up to the next aligned bucket size.
  * - Coalescing occurs only when physically adjacent blocks are free.
- * - Requires external storage for bucket index table and heap memory region.
  *
  *  Created on: May 22, 2025
  *      Author: newenclave

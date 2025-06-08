@@ -57,7 +57,14 @@ namespace aikartos::modules {
 			};
 		}
 
+		bool load(void *ptr) {
+			return load(reinterpret_cast<std::uintptr_t>(ptr));
+		}
+
 		bool load(std::uintptr_t addr) {
+			if(addr == 0) {
+				return false;
+			}
 			const auto hdr = reinterpret_cast<const header *>(base_addr_);
 			const auto image_addr = base_addr_ + hdr->entry_offset;
 			memcpy(reinterpret_cast<void *>(addr), reinterpret_cast<void *>(image_addr), hdr->image_size);
@@ -87,17 +94,19 @@ namespace aikartos::modules {
 	private:
 
 		void apply_relocations(std::uintptr_t addr) const {
-			const auto hdr = reinterpret_cast<const header *>(base_addr_);
-			std::uint32_t *relocation_table = reinterpret_cast<std::uint32_t *>(base_addr_ + hdr->entry_offset + hdr->image_size);
-			for(std::size_t i=0; i<hdr->reloc_count; ++i) {
-			    const std::uint32_t offset = relocation_table[i];
-			    std::uint32_t* reloc_address = reinterpret_cast<std::uint32_t*>(addr + offset);
-			    const bool valid = (*reloc_address % 4 == 0)
-			    		&& (*reloc_address < hdr->image_size)
-						&& (*reloc_address != 0);
-			    if(valid) {
-				    *reloc_address += addr;
-			    }
+			const auto hdr = reinterpret_cast<const header*>(base_addr_);
+			std::uint32_t *relocation_table =
+					reinterpret_cast<std::uint32_t*>(base_addr_ + hdr->entry_offset + hdr->image_size);
+			for (std::size_t i = 0; i < hdr->reloc_count; ++i) {
+				const std::uint32_t offset = relocation_table[i];
+				std::uint32_t *reloc_address = reinterpret_cast<std::uint32_t*>(addr + offset);
+				const auto realloc_value = *reloc_address;
+				const bool valid = (realloc_value % 4 == 0)
+						&& (realloc_value < hdr->image_size)
+						&& (realloc_value != 0);
+				if (valid) {
+					*reloc_address += addr;
+				}
 			}
 		}
 

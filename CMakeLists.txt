@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(aikartos C CXX ASM)
 
-
 if(NOT DEFINED PLATFORM)
   message(FATAL_ERROR "Use -DPLATFORM=f411 or -DPLATFORM=h753")
 endif()
