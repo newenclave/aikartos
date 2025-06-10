@@ -150,7 +150,7 @@ This project uses **CMake** as its build system and can be built with **Ninja**,
       -DPLATFORM=f411 \
       -DCMSIS_DIRECTORY="C:/soft/ST/STM32Cube_FW_F4/STM32Cube_FW_F4_V1.28.0/Drivers/CMSIS"
   ```
-> Note: platform and paths must match your environment.  
+> Note: paths must match your environment.  
 
 3. Build 
 
