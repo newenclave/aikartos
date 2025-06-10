@@ -137,30 +137,30 @@ This project is built using **CMake** and **Ninja**.
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/your-username/aikartos.git
+  ```bash
+   git clone https://github.com/newenclave/aikartos.git
    cd aikartos
   ```
 
 2. Configure the build (an example):
 
   ```bash
-  cmake -G "Ninja" -B build_f411 \
+    cmake -G "Ninja" -B build_f411 \
       -DCMAKE_TOOLCHAIN_FILE=gcc-arm-none-eabi.cmake \
       -DPLATFORM=f411 \
       -DCMSIS_DIRECTORY="C:/soft/ST/STM32Cube_FW_F4/STM32Cube_FW_F4_V1.28.0/Drivers/CMSIS"
   ```
+> Note: platform and paths must match your environment.  
 
 3. Build 
 
   ```bash
-  cd build_f411
-  ninja
+    cd build_f411
+    ninja
   ```
 
 4. Flash using your preferred tool (e.g., ST-Link, OpenOCD, CubeProgrammer).
 
-> Note: platform and paths must match your environment.  
 
 
 
