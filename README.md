@@ -133,7 +133,7 @@ To build and run this project, you will need:
 
 ### CMake-based build
 
-This project is built using **CMake** and **Ninja**.
+This project uses **CMake** as its build system and can be built with **Ninja**, **Make**, or **STM32CubeIDE**.
 
 1. Clone the repository:
 
