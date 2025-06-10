@@ -91,16 +91,16 @@ add_executable(aikartos.elf
 
 target_sources(aikartos.elf PRIVATE ${STARTUP_SOURCES})
 
-target_link_libraries(aikartos.elf
-  -lc
-  -lm
-  -lstdc++
-  -lsupc++
-  -lgcc
-)
+# target_link_libraries(aikartos.elf
+#   -lc
+#   -lm
+#   -lstdc++
+#   -lsupc++
+#   -lgcc
+# )
 
 target_link_options(aikartos.elf PRIVATE
-    -mcpu=cortex-m4 
+    -mcpu=${MCPU}
     -T${LINKER_SCRIPT}
     -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/aikartos.map
     -Wl,--gc-sections 

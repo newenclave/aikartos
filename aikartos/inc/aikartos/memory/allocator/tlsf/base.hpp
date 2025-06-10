@@ -23,6 +23,7 @@
 
 #pragma once 
 
+#include <string.h>
 #include "aikartos/utils/align_up.hpp"
 
 namespace aikartos::memory::allocator::tlsf {
@@ -137,7 +138,7 @@ namespace aikartos::memory::allocator::tlsf {
 			requires StateConcept<StateT> && IndicesAccessorConcept<StateT>
 		{
 			const std::uintptr_t begin_addr = state.get_begin_addr();
-			const std::uintptr_t end_addr = state.get_end_addr();
+			const std::uintptr_t end_addr = state.get_end_addr() & ~std::uintptr_t {1};
 
 #ifdef DEBUG
 			auto *uptr = reinterpret_cast<std::uint32_t *>(begin_addr);
@@ -169,9 +170,40 @@ namespace aikartos::memory::allocator::tlsf {
 			requires(IndicesAccessorConcept<StateT>&& StateConcept<StateT>)
 		{
 			if (auto* block = find_proper_block(state, requested_size)) {
+				remove_from_list(state, block);
 				block = split_block(state, block, requested_size);
 				block->mark_used();
 				return block->payload_ptr();
+			}
+			return nullptr;
+		}
+
+		template <typename StateT>
+		static void* reallocate(StateT& state, void* ptr, std::size_t new_requested_size)
+			requires(IndicesAccessorConcept<StateT>&& StateConcept<StateT>)
+		{
+			if (!ptr) {
+				return allocate(state, new_requested_size);
+			}
+
+			auto* block = block_header::header_ptr_from_payload(ptr);
+
+			if(!check_block_valid(state, block)) {
+				return nullptr;
+			}
+
+			const std::size_t fixed_requested_size = align_up(new_requested_size + block_header::aligned_size());
+			if (auto in_place_block = try_expand_in_place(state, block, fixed_requested_size)) {
+				memmove(in_place_block->payload_ptr(), ptr, std::min(block->available(), new_requested_size));
+				block->mark_free();
+				split_block(state, in_place_block, new_requested_size);
+
+				return in_place_block->payload_ptr();
+			}
+			else if(auto new_ptr = allocate(state, new_requested_size)) {
+				memmove(new_ptr, ptr, std::min(block->available(), new_requested_size));
+				free(state, ptr);
+				return new_ptr;
 			}
 			return nullptr;
 		}
@@ -185,20 +217,8 @@ namespace aikartos::memory::allocator::tlsf {
 			}
 
 			auto* header = block_header::header_ptr_from_payload(ptr);
-			std::uintptr_t payload_addr = reinterpret_cast<std::uintptr_t>(ptr);
-			const auto begin_addr = state.get_begin_addr();
-			const auto end_addr = state.get_end_addr();
 
-			if ((payload_addr < begin_addr) || (payload_addr >= end_addr)) {
-				return;
-			}
-
-			std::uintptr_t header_addr = reinterpret_cast<std::uintptr_t>(header);
-			if ((header_addr < begin_addr) || (header_addr >= end_addr)) {
-				return;
-			}
-
-			if (!header->is_used()) {
+			if(!check_block_valid(state, header)) {
 				return;
 			}
 
@@ -246,6 +266,72 @@ namespace aikartos::memory::allocator::tlsf {
 		}
 
 	private:
+
+		template <typename StateT>
+		static bool check_block_valid(StateT& state, block_header_ptr block)
+			requires(IndicesAccessorConcept<StateT> && StateConcept<StateT>)
+		{
+			std::uintptr_t payload_addr = block->payload_addr();
+			const auto begin_addr = state.get_begin_addr();
+			const auto end_addr = state.get_end_addr();
+
+			if ((payload_addr < begin_addr) || (payload_addr >= end_addr)) {
+				return false;
+			}
+
+			std::uintptr_t header_addr = reinterpret_cast<std::uintptr_t>(block);
+			if ((header_addr < begin_addr) || (header_addr >= end_addr)) {
+				return false;
+			}
+
+			if (!block->is_used()) {
+				return false;
+			}
+			return true;
+		}
+
+		template <StateConcept StateT>
+		static block_header_ptr try_expand_in_place(StateT& state, block_header_ptr block, std::size_t fixed_requested_size)
+			requires(IndicesAccessorConcept<StateT>&& StateConcept<StateT>)
+		{
+			std::size_t full_available = get_in_place_available_size(state, block);
+			if (fixed_requested_size <= full_available) {
+				return merge(state, block);
+			}
+
+			return nullptr;
+		}
+
+		template <StateConcept StateT>
+		static std::size_t get_in_place_available_size(StateT& state, block_header_ptr block) {
+			return get_forward_available_size(state, block)
+				+ get_backward_available_size(state, block)
+				+ block->size();
+		}
+
+		template <StateConcept StateT>
+		static std::size_t get_forward_available_size(StateT& state, block_header_ptr block) {
+			std::size_t result = 0;
+			auto* next_block = get_next_physical(state, block);
+
+			while (next_block && !next_block->is_used()) {
+				result += next_block->size();
+				next_block = get_next_physical(state, next_block);
+			}
+			return result;
+		}
+
+		template <StateConcept StateT>
+		static std::size_t get_backward_available_size(StateT& state, block_header_ptr block) {
+			std::size_t result = 0;
+			auto* prev_block = get_prev_physical(state, block);
+
+			while (prev_block && !prev_block->is_used()) {
+				result += prev_block->size();
+				prev_block = get_prev_physical(state, prev_block);
+			}
+			return result;
+		}
 
 		constexpr static std::tuple<std::size_t, std::size_t> split_size(std::size_t size) {
 			const auto main_class = find_max_log2(size);

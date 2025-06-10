@@ -35,7 +35,7 @@ namespace {
 
 namespace tests {
 
-	using allocator_type = memory::allocator_tlsf_fixed<256*1024>;
+	using allocator_type = memory::allocator_tlsf_fixed<32*1024>;
 	//using allocator_type = memory::allocator_tlsf_fixed<64*1024>;
 	using config = kernel::config;
 	namespace sch_ns = sch::round_robin;
@@ -55,13 +55,15 @@ namespace tests {
 		uart_printer("MEMORY BLOCK USED: %u\r\n", memory::get_allocator()->total());
 		rnd::xorshift32 rng(kernel::core::get_systick_val());
 
+		// Alloc
 		for(std::size_t i=0; i<POINTERS_COUNT; ++i) {
 			auto next = rng.next() % MAXIMUM_BLOCK + 1;
-			allocated[i] = malloc(next);
+			allocated[i] = calloc(next, 1);
 		}
 		uart_printer("After malloc:\r\n\r\n");
 		memory::get_allocator()->dump_heap(uart_printer);
 
+		// random free
 		for(std::size_t i=0; i<POINTERS_COUNT; ++i) {
 			auto next = rng.next() % POINTERS_COUNT;
 			free(allocated[next]);
@@ -70,6 +72,19 @@ namespace tests {
 		uart_printer("After random free:\r\n\r\n");
 		memory::get_allocator()->dump_heap(uart_printer);
 
+		// ReAlloc
+		for(std::size_t i=0; i<POINTERS_COUNT; ++i) {
+			auto next = rng.next() % MAXIMUM_BLOCK + 1;
+			if(allocated[i]) {
+				if(auto new_ptr = realloc(allocated[i], next)) {
+					allocated[i] = new_ptr;
+				}
+			}
+		}
+		uart_printer("After random realloc:\r\n\r\n");
+		memory::get_allocator()->dump_heap(uart_printer);
+
+		// full free
 		for(std::size_t i=0; i<POINTERS_COUNT; ++i) {
 			free(allocated[i]);
 		}

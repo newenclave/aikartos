@@ -7,6 +7,7 @@
  */
 
 #include <cstdlib>
+#include <string.h>
 
 #include "aikartos/device/device.hpp"
 #include "aikartos/memory/core.hpp"
@@ -26,6 +27,22 @@ namespace aikartos::memory {
 			DEBUG_ASSERT(core::instance_ != nullptr, "Allocator not initialized");
 			aikartos::sync::irq_critical_section irq_disable;
 			return core::instance_->alloc(size);
+		}
+
+		inline static auto calloc(std::size_t size) {
+			DEBUG_ASSERT(core::instance_ != nullptr, "Allocator not initialized");
+			aikartos::sync::irq_critical_section irq_disable;
+			auto *ptr = core::instance_->alloc(size);
+			if(ptr) {
+				memset(ptr, 0, size);
+			}
+			return ptr;
+		}
+
+		inline static auto realloc(void *ptr, std::size_t size) {
+			DEBUG_ASSERT(core::instance_ != nullptr, "Allocator not initialized");
+			aikartos::sync::irq_critical_section irq_disable;
+			return core::instance_->realloc(ptr, size);
 		}
 
 		inline static auto free(void *ptr) {
@@ -49,6 +66,14 @@ extern "C" {
 
 	void* malloc(std::size_t size) {
 		return aikartos::memory::memory_core_friend::alloc(size);
+	}
+
+	void* calloc(std::size_t num, std::size_t size) {
+		return aikartos::memory::memory_core_friend::calloc(num * size);
+	}
+
+	void* realloc(void *ptr, std::size_t size) {
+		return aikartos::memory::memory_core_friend::realloc(ptr, size);
 	}
 
 	void free(void* ptr) {

@@ -21,6 +21,7 @@ namespace aikartos::memory {
 		virtual ~allocator_base() = default;
 		virtual void init(std::uintptr_t begin, std::uintptr_t end) = 0;
 		virtual void *alloc(std::size_t size) = 0;
+		virtual void *realloc(void *ptr, std::size_t size) = 0;
 		virtual void free(void *ptr) = 0;
 		virtual std::size_t total() const { return 0; }
 		virtual void dump_heap(printer_type print) const = 0; //{  }
