@@ -117,29 +117,47 @@ This project is licensed under the [MIT License](LICENSE).
 
 To build and run this project, you will need:
 
-- **ARM toolchain** (e.g., `arm-none-eabi-gcc`)
-- **STM32Cube Firmware Package for STM32F4** 
-  This includes the necessary device headers like `<stm32f4xx.h>` and HAL/LL drivers.
-  You can download it via:
-  - [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html)
-  - [STM32CubeF4 Package](https://www.st.com/en/embedded-software/stm32cubef4.html)
+- **ARM toolchain** (e.g., `arm-none-eabi-gcc`, `arm-none-eabi-newlib`)
+- **STM32Cube Firmware Package** for the selected platform (F4 or H7)  
+  This includes the necessary device headers like `<stm32f4xx.h>` or `<stm32h7xx.h>` and low-level drivers.
 
-> Make sure the firmware package is correctly installed and accessible to your build system or IDE.
+> You can download the STM32Cube packages via:
+>
+> - [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html)
+> - [STM32CubeF4](https://www.st.com/en/embedded-software/stm32cubef4.html)
+> - [STM32CubeH7](https://www.st.com/en/embedded-software/stm32cubeh7.html)
+
+---
 
 ## Getting Started
+
+### CMake-based build
+
+This project is built using **CMake** and **Ninja**.
 
 1. Clone the repository:
 
    ```bash
    git clone https://github.com/your-username/aikartos.git
-   ```
+   cd aikartos
+  ```
 
-2. Open the project in your preferred IDE:
+2. Configure the build (an example):
+  ```bash
+  cmake -G "Ninja" -B build_f411 \
+      -DCMAKE_TOOLCHAIN_FILE=gcc-arm-none-eabi.cmake \
+      -DPLATFORM=f411 \
+      -DCMSIS_DIRECTORY="C:/soft/ST/STM32Cube_FW_F4/STM32Cube_FW_F4_V1.28.0/Drivers/CMSIS"
+  ```
+3. Build 
+  ```bash
+  cd build_f411
+  ninja
+  ```
 
-   * STM32CubeIDE (tested)
-   * VSCode with Cortex-Debug plugin
-   * Any other IDE supporting STM32 development
+4. Flash using your preferred tool (e.g., ST-Link, OpenOCD, CubeProgrammer).
 
-3. Flash the project to your NUCLEO-F411RE board.
+> Note: platform and paths must match your environment.  
+
 
 
