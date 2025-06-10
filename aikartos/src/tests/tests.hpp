@@ -32,13 +32,13 @@
 //#define ENABLE_TEST_memory_allocator_buddy_fixed
 
 //#define ENABLE_TEST_memory_allocator_tlsf
-//#define ENABLE_TEST_memory_allocator_tlsf_fixed
+#define ENABLE_TEST_memory_allocator_tlsf_fixed
 
 //#define ENABLE_TEST_device_aurt_echo
 //#define ENABLE_TEST_the_snake_
 
 //#define ENABLE_TEST_FPU_demo_01
-#define ENABLE_TEST_FPU_demo_02
+//#define ENABLE_TEST_FPU_demo_02
 //#define ENABLE_TEST_FPU_demo_03
 
 #include <atomic>

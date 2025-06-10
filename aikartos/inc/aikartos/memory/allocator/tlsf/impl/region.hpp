@@ -82,6 +82,10 @@ namespace aikartos::memory::allocator::tlsf::impl {
 			return tlsf_base::allocate(state_, size);
 		}
 
+		void *realloc(void *ptr, std::size_t size) override {
+			return tlsf_base::reallocate(state_, ptr, size);
+		}
+
 		void free(void* ptr) override {
 			return tlsf_base::free(state_, ptr);
 		}
