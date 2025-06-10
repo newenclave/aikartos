@@ -107,6 +107,8 @@ namespace aikartos::modules {
 				if (valid) {
 					*reloc_address += addr;
 				}
+				*reloc_address += 1;
+				*reloc_address -= 1;
 			}
 		}
 

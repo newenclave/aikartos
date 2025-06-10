@@ -28,7 +28,7 @@ extern "C" int module_entry(module_param *param) {
 	param->printer("\r\n==========\r\n");
 	while(1) {
 		param->printer("%s %i %p\r\n", param->name, g_counter++, (void *)&g_counter);
-		param->sleep(100);
+		param->sleep(10000);
 	}
 	return 0;
 }
