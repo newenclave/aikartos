@@ -85,6 +85,11 @@ namespace tests {
 
 			test_m.load(reinterpret_cast<std::uintptr_t>(exec_memory));
 
+			device::uart::blocking_write(test_m.get_description().data(), test_m.get_description().size());
+			uart_printer("\r\n");
+
+			//test_m.get_entry_point<tasks::control_block::task_entry>()((void *)&m1);
+
 			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m1);
 
 			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m2);
