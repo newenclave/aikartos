@@ -19,6 +19,8 @@
 #include "aikartos/modules/module.hpp"
 #include "aikartos/modules/bundle.hpp"
 
+#include "aikartos/sdk/aikartos_api.h"
+
 #include "tests.hpp"
 
 #ifdef ENABLE_TEST_modules_001
@@ -42,13 +44,7 @@ namespace tests {
 	constexpr std::size_t MAXIMUM_BLOCK = 1000;
 	void *allocated[POINTERS_COUNT];
 
-	struct module_param {
-		const char *name;
-		printer_type printer;
-		sleep_type sleep;
-	};
-
-	using module_call = int(*)(module_param *);
+	using module_call = int(*)(aikartos_api *);
 
 	int test::run(void)
 	{
@@ -63,31 +59,31 @@ namespace tests {
 		[[maybe_unused]] const bool is_module = modules::module::is_module_address(bin_data);
 		[[maybe_unused]] const bool is_bundle = modules::bundle::is_bundle_address(bin_data);
 
-		module_param m1 = {
-			.name = "Module 1",
-			.printer = uart_printer,
-			.sleep = &kernel::sleep,
-		};
-
-		module_param m2 = {
-			.name = "Module 2",
-			.printer = uart_printer,
-			.sleep = &kernel::sleep,
-		};
-
+		aikartos_api api;
+		api.device.uart_write = aikartos::device::uart::blocking_write;
+		api.this_task.sleep = &kernel::sleep;
+		api.kernel.add_task = &kernel::core::add_task;
 
 		if(is_module) {
 			modules::module test_m(bin_data);
 			[[maybe_unused]] const bool crc_ok = test_m.check_crc32();
 			[[maybe_unused]] auto desc = test_m.get_description();
 
+			api.module.module_base = test_m.get_binary_base();
+			api.module.module_size = test_m.get_binary_size();
+
 			void* exec_memory = (void*)malloc(test_m.get_image_size());
 
 			test_m.load(reinterpret_cast<std::uintptr_t>(exec_memory));
 
-			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m1);
+			device::uart::blocking_write(test_m.get_description().data(), test_m.get_description().size());
+			uart_printer("\r\n");
 
-			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &m2);
+			//test_m.get_entry_point<tasks::control_block::task_entry>()((void *)&m1);
+
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &api);
+
+			kernel::add_task(test_m.get_entry_point<tasks::control_block::task_entry>(), &api);
 
 		}
 		else if(is_bundle) {
@@ -101,9 +97,9 @@ namespace tests {
 			mod1->load(m1_entry);
 			mod2->load(m2_entry);
 
-			kernel::add_task(mod1->get_entry_point<tasks::control_block::task_entry>(), &m1);
+			kernel::add_task(mod1->get_entry_point<tasks::control_block::task_entry>(), &api);
 
-			kernel::add_task(mod2->get_entry_point<tasks::control_block::task_entry>(), &m2);
+			kernel::add_task(mod2->get_entry_point<tasks::control_block::task_entry>(), &api);
 
 		}
 

@@ -65,17 +65,18 @@ def make_bundle(output_path, modules):
 
 def main():
     parser = argparse.ArgumentParser(description="Flash multiple modules to STM32 using st-flash")
-    parser.add_argument('-a', '--address', required=True, help='Start address (e.g., 0x80003000)')
+    parser.add_argument('-a', '--address', required=False, help='Start address (e.g., 0x08060000) (optional) if not specified, will not flash)')
     parser.add_argument('-o', '--output', default=None, help='Output bundle file (optional)')
     parser.add_argument('-m', '--module', action='append', required=True, help='Binary module file (.bin)')
     parser.add_argument('--align', type=int, default=0x8, help='Align address to this value (default: 0x8)')
     args = parser.parse_args()
 
-    try:
-        current_address = int(args.address, 16)
-    except ValueError:
-        print(f"[!] Invalid address: {args.address}")
-        exit(1)
+    if args.address:
+        try:
+            current_address = int(args.address, 16)
+        except ValueError:
+            print(f"[!] Invalid address: {args.address}")
+            exit(1)
 
     print(f"[*] Starting flashing at address: 0x{current_address:08X}")
     print(f"[*] Alignment: 0x{args.align:X}")
@@ -87,14 +88,15 @@ def main():
 
     make_bundle(output_path, args.module)
 
+    if args.address:
         # call st-flash
-    cmd = ['st-flash', 'write', output_path, f'0x{current_address:X}']
-    print(" ".join(cmd))
-    result = subprocess.run(cmd, check=True)
+        cmd = ['st-flash', 'write', output_path, f'0x{current_address:X}']
+        print(" ".join(cmd))
+        result = subprocess.run(cmd, check=True)
 
-    if result.returncode != 0:
-        print(f"[!] Failed to flash {output_path}")
-        exit(1)
+        if result.returncode != 0:
+            print(f"[!] Failed to flash {output_path}")
+            exit(1)
 
 if __name__ == '__main__':
     main()

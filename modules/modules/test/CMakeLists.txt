@@ -22,15 +22,15 @@ include_directories(
 add_executable(${MODULE_NAME}_elf ${SOURCES})
 
 target_compile_options(${MODULE_NAME}_elf PRIVATE
-    -nostdlib 
+    #-nostdlib 
     -nodefaultlibs 
     -nostartfiles
     -mcpu=${MCPU} 
-    -mthumb 
-    -fno-exceptions 
-    -fno-rtti 
-    -ffreestanding
-    -Os
+    -mthumb
+    -Wall -Wextra -Wno-unused-parameter -Wdouble-promotion
+    -fno-exceptions
+    -fno-rtti
+    -fdata-sections
     -fno-threadsafe-statics
     -std=gnu++20
     -mfpu=fpv4-sp-d16 -mfloat-abi=hard
@@ -39,7 +39,22 @@ target_compile_options(${MODULE_NAME}_elf PRIVATE
     -fstack-usage 
     -fcyclomatic-complexity
     -U_GLIBCXX_HAS_GTHREADS
+    --specs=nano.specs 
     ${PLATFORM_DEFINES}
+)
+
+target_link_options(${MODULE_NAME}_elf PRIVATE
+    -mcpu=${MCPU}
+    -Wl,--gc-sections 
+        -nodefaultlibs 
+        -static 
+        --specs=nano.specs 
+        -mfpu=fpv4-sp-d16 
+        -mfloat-abi=hard 
+        -mthumb 
+    -Wl,--start-group 
+        -lc -lm -lgcc
+    -Wl,--end-group
 )
 
 target_link_options(${MODULE_NAME}_elf PRIVATE -T ${LD_SCRIPT} "-Wl,--emit-relocs" -Os)
@@ -63,10 +78,10 @@ add_custom_command(
     COMMENT "[+] Generating raw binary for ${MODULE_NAME}"
 )
 
-set(PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/build/scripts/create_bin.py)
+set(PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/build/scripts/create_bin2.py)
 
 if(MODULE_DESCRIPTION)
-    set(MODULE_DESCRIPTION_ARG "-d ${MODULE_DESCRIPTION}")
+    set(MODULE_DESCRIPTION_ARG "-d \"${MODULE_DESCRIPTION}\"")
 else()
     set(MODULE_DESCRIPTION_ARG "")
 endif()
