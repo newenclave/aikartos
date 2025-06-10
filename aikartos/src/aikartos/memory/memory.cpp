@@ -7,7 +7,7 @@
  */
 
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 
 #include "aikartos/device/device.hpp"
 #include "aikartos/memory/core.hpp"
@@ -34,7 +34,7 @@ namespace aikartos::memory {
 			aikartos::sync::irq_critical_section irq_disable;
 			auto *ptr = core::instance_->alloc(size);
 			if(ptr) {
-				memset(ptr, 0, size);
+				std::memset(ptr, 0, size);
 			}
 			return ptr;
 		}
