@@ -2,6 +2,8 @@
 
 AikaRTOS supports dynamically loadable modules and a simple bundle format to group multiple modules together. This system is great for embedded use cases where you want flexibility and runtime extension without full firmware reflash.
 
+> ⚠️ **Note:** This system is under active development. Features and formats may evolve. More tools and features are planned
+
 ---
 
 ## Modules Overview
