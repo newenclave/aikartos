@@ -116,8 +116,8 @@ if (is_module(base)) {
 
 ## Toolchain
 
-* **create\_bin.py**: generates `.bin` module from `.elf`
-* **create\_flash\_bundle.py**: joins multiple `.bin` files into a bundle
+* [**create\_bin.py**](build/scripts/create_bin.py): generates `.bin` module from `.elf`
+* [**create\_flash\_bundle.py**](build/scripts/create_flash_bundle.py): joins multiple `.bin` files into a bundle
 
 ---
 
