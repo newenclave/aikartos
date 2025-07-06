@@ -27,6 +27,7 @@ The project is written in **C++20**.
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
+- [Modules](#modules)
 
 ---
 
@@ -143,3 +144,6 @@ To build and run this project, you will need:
 3. Flash the project to your NUCLEO-F411RE board.
 
 
+## Modules 
+
+See [Modules and Bundle Format](modules/modules.md) for details on how modules work in AikaRTOS.

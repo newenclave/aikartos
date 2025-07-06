@@ -78,7 +78,7 @@ add_custom_command(
     COMMENT "[+] Generating raw binary for ${MODULE_NAME}"
 )
 
-set(PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/build/scripts/create_bin2.py)
+set(PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/build/scripts/create_bin.py)
 
 if(MODULE_DESCRIPTION)
     set(MODULE_DESCRIPTION_ARG "-d \"${MODULE_DESCRIPTION}\"")

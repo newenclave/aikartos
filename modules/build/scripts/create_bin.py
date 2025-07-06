@@ -1,15 +1,188 @@
 import argparse
 import struct
 from elftools.elf.elffile import ELFFile
+from elftools.elf.enums import ENUM_ST_INFO_TYPE
+
 import zlib
 
+args = None
+
 HEADER_SIGNATURE = int.from_bytes(b'AIKM', byteorder='little')  # 'AIKa Module'
-HEADER_SIZE = 32  # 32 header
-ENTRY_OFFSET = 0x10  # default after header starts .text section
+HEADER_SIZE = 64  # 48 header
 
 def align_up(value, alignment):
     """Aligns value up to the nearest multiple of alignment."""
     return (value + alignment - 1) & ~(alignment - 1)
+
+REL_EXPORTED = {'text': 1, 'data': 2, 'rodata': 3, 'bss': 4}
+
+ARM_RELOC_MAP = {
+    0: 'R_ARM_NONE',
+    1: 'R_ARM_PC24',
+    2: 'R_ARM_ABS32',
+    3: 'R_ARM_REL32',
+    10: 'R_ARM_THM_CALL',
+    21: 'R_ARM_ABS32',
+    23: 'R_ARM_REL32',
+    45: 'R_ARM_THM_JUMP11',
+    46: 'R_ARM_THM_MOVW_PREL_NC',
+    47: 'R_ARM_THM_MOVW_ABS_NC',
+    48: 'R_ARM_THM_MOVT_ABS',
+    49: 'R_ARM_THM_MOVW_BF16',
+    50: 'R_ARM_THM_MOVW_BF12',
+    51: 'R_ARM_THM_MOVW_BA16',
+    102: 'R_ARM_THM_ALU_PREV_INST',
+    104: 'R_ARM_THM_PC12',
+    105: 'R_ARM_THM_MOVW_PREL',
+    106: 'R_ARM_THM_MOVT_PREL',
+    108: 'R_ARM_THM_JUMP19',
+}
+
+def inc_ref_count(sym_table, sym_idx):
+    for s in sym_table:
+        if s['index'] == sym_idx:
+            s['ref_count'] = s['ref_count'] + 1
+            return
+
+def inc_ref_count_dict(sym_dict, sym_idx):
+    if sym_idx in sym_dict:
+        sym_dict[sym_idx]['ref_count'] = sym_dict[sym_idx]['ref_count'] + 1
+
+def type_to_string(type):
+    if type in ARM_RELOC_MAP:
+        return ARM_RELOC_MAP[type]
+    return 'NONE'
+
+def section_to_id(section):
+    if section in REL_EXPORTED:
+        return REL_EXPORTED[section]
+    return 0
+
+def get_symbol_position(symbols, sym_index):
+    id = 0
+    for idx, _ in symbols.items():
+        if idx == sym_index:
+            return id
+        id = id + 1
+    return -1
+
+def show_section_list(elf):
+    print("[*] Sections:")
+    for idx, sec in enumerate(elf.iter_sections()):
+        print(f"  [{idx}] {sec.name} (type: {sec['sh_type']}, flags: {sec['sh_flags']}, offset: {sec['sh_offset']}, addr: {hex(sec['sh_addr'])}, size: {sec['sh_size']})")
+    print("[*] End of sections")
+
+def parse_relocations(elf_path):
+    with open(elf_path, 'rb') as f:
+        elf = ELFFile(f)
+
+        relocations = []
+        symbols_map = {}
+
+        entry_point = elf.header['e_entry']
+        print(f"[*] ELF Entry Point: 0x{entry_point:08X}")
+
+        bss_length = 0
+        bss_start = 0
+
+        # get bss section
+        bss_sec = elf.get_section_by_name('.bss')
+        if not bss_sec:
+            print("[!] No .bss section found")
+        bss_length = bss_sec['sh_size']
+        bss_start = bss_sec['sh_addr']
+        print(f"[+] BSS section found: {bss_sec.name} (size: {bss_length}, start: {bss_start})")
+
+        # parse symbols
+        symtab_sec = elf.get_section_by_name('.symtab')
+        if not symtab_sec:
+            print("[!] No symbol table found")
+            return
+
+        if args.verbose:
+            show_section_list(elf)
+
+        for idx, sym in enumerate(symtab_sec.iter_symbols()):
+            # if sym['st_info']['type'] == 'STT_SECTION':
+            #     continue # sections are not needed
+
+            symbols_map[idx] = {
+                'value': sym['st_value'],
+                'size': sym['st_size'],
+                'name': sym.name,
+                'type': sym['st_info']['type'],
+                'type_val': ENUM_ST_INFO_TYPE.get(sym['st_info']['type'], -1),
+                'section': sym['st_shndx'],
+                'ref_count': 0,
+            }
+
+
+        # all sections. Get relocations
+        for idx, sec in enumerate(elf.iter_sections()):
+
+            sec_name = sec.name
+            if(len(sec.name) == 0):
+                continue
+            if sec_name[0] == '.':
+                sec_name = sec_name[1:]
+            if sec_name in REL_EXPORTED:
+                REL_EXPORTED[sec_name] = idx
+                continue
+                
+            ssec = list(filter(lambda v: len(v) > 0, sec.name.split('.')))
+            print(f"[+] Section: {sec.name} -> {ssec}")
+            if len(ssec) > 1 and (ssec[0] == 'rel' or ssec[0] == 'rela') and ssec[1] in REL_EXPORTED:
+                rel_section = sec
+                symtab = elf.get_section(rel_section['sh_link'])
+                target_sec = elf.get_section(rel_section['sh_info'])
+
+                print(f"  [+] Found relocations in {rel_section.name} (applies to {target_sec.name})")
+
+                for reloc in rel_section.iter_relocations():
+                    offset = reloc['r_offset']
+                    sym_index = reloc['r_info_sym']
+                    reloc_type = reloc['r_info_type']
+
+                    relocations.append({
+                        'section': sec.name,
+                        'idx': section_to_id(ssec[1]),
+                        'offset': offset,
+                        'type': reloc_type,
+                        'stype': type_to_string(reloc_type),
+                        'sym_index': sym_index,
+                    })
+                    inc_ref_count_dict(symbols_map, sym_index)
+
+        print("[*] Symbols MAP:")
+        for idx, sym in symbols_map.items():
+            if sym['ref_count'] == 0:
+                print(f"  [!] Symbol {sym['name']} (index {idx}) has no references. {sym}")
+                continue
+        symbols_map = {idx: sym for idx, sym in symbols_map.items() if sym.get('ref_count', 0) > 0}
+        sym_values = []
+        for idx, sym in symbols_map.items():
+            value = struct.pack('<IIII', sym['value'], sym['section'], sym['type_val'], 0);
+            sym_values.append(value)
+            if args.verbose:
+                print(f"  [*] {idx} -> {sym}")
+
+        print("[*] Relocations:")
+        rel_values = []
+        for rel in relocations:
+            sym_pos = get_symbol_position(symbols_map, rel['sym_index'])
+            if sym_pos == -1:
+                print(f"  [!] Symbol index {rel['sym_index']} not found in symbols map, skipping relocation.")
+                continue
+            value = struct.pack('<IIII', rel['offset'], rel['type'], rel['idx'], sym_pos);
+            if args.verbose:
+                print(f"  [*] {rel}")
+            rel_values.append(value)
+
+        return {'relocations': rel_values, 
+                'symbols': sym_values, 
+                'bss_start': bss_start, 
+                'bss_length': bss_length,
+                'entry_point': entry_point}
 
 def main(): 
     parser = argparse.ArgumentParser(description="Prepare module binary with header and relocations.")
@@ -31,8 +204,8 @@ def main():
     parser.add_argument('-d', '--description', nargs='?', default='', 
                         help='Module description (optional)')
 
+    global args
     args = parser.parse_args()
-
 
     if args.verbose:
         print(f"[+] ELF file: {args.elf}")
@@ -65,85 +238,84 @@ def main():
         bin_data = f.read()
     bin_size = len(bin_data)
     fixed_bin_size = align_up(bin_size, 8)# align up to 8 bytes
-    bin_size_padded = fixed_bin_size - bin_size
-    
-    text_size = 0
-    data_size = 0
-    bss_size = 0
+    bin_size_padding = fixed_bin_size - bin_size
 
-    relocation_offsets = []
+    binary_data = parse_relocations(args.elf)
 
-    with open(args.elf, 'rb') as f:
-        print(f"[*] ELF file: {args.elf}...")
-        elf = ELFFile(f)
-        if args.verbose:
-            print("[*] Scanning sections for relocations...")    
-            for section in elf.iter_sections():
-                print(f"[*]     Section: {section.name}, addr={hex(section['sh_addr'])}, size={section['sh_size']} bytes")
+    relocs = binary_data['relocations']
+    symbols = binary_data['symbols']
+    bss_offset = binary_data['bss_start']
+    bss_length = binary_data['bss_length']
+    entry_point = binary_data['entry_point']
 
-        text_section = elf.get_section_by_name('.text')
-        if text_section:
-            text_size = text_section['sh_size']
-            if args.verbose:
-                print(f"[*] .text section: addr={hex(text_section['sh_addr'])}, size={text_size} bytes")
-                
-        data_section = elf.get_section_by_name('.data')
-        if data_section:
-            data_size = data_section['sh_size']
-            if args.verbose:
-                print(f"[*] .data section: addr={hex(data_section['sh_addr'])}, size={data_size} bytes")
+    reloc_count = len(relocs)   # each relocation is 16 bytes
+    symbols_count = len(symbols)  # each symbol is 16 bytes
 
-        bss_section = elf.get_section_by_name('.bss')
-        bss_size = bss_section['sh_size'] if bss_section else 0
-        bin_size = bin_size + bss_size 
-        fixed_bin_size = align_up(bin_size, 8)
-        bin_size_padded = fixed_bin_size - bin_size
+    reloc_offset = entry_offset + fixed_bin_size
+    symbols_offset = reloc_offset + (reloc_count * 16)
 
-        if args.verbose:
-            print(f"[*] BSS section size: {bss_size} bytes")
-            print(f"[*] Total binary size (with BSS): {bin_size} bytes")
-            print(f"[*] Padded binary size: {fixed_bin_size} bytes")
-
-        for section in elf.iter_sections():
-            if not section.name.startswith('.rel'):
-                continue
-            for rel in section.iter_relocations():
-                print(f"[*] Found relocation in section {section.name}: offset={hex(rel['r_offset'])} ({rel['r_offset']})")
-                relocation_offsets.append(rel['r_offset'])
-
-    relocation_offsets = sorted(set(relocation_offsets))
-    relocation_table = b''.join([struct.pack("<I", offset) for offset in relocation_offsets])
-    relocation_count = len(relocation_offsets)
-    header = struct.pack("<IIIIIIII", 
+    header = struct.pack("<IIII IIII IIII IIII", 
                          HEADER_SIGNATURE,  # +0
-                         fixed_bin_size,    # +4
-                         entry_offset,      # +8
-                         0,                 # +12 crc32 offset
-                         0, 0,              # +16 reserved, +20 reserved
-                         relocation_count,  # +24
-                         HEADER_SIZE + fixed_bin_size + description_fixed_size + len(relocation_table))	# +28 total size
+                         (1 << 16) | (HEADER_SIZE & 0xFFFF), # +4 version + HEADER_SIZE 
+                         entry_offset, fixed_bin_size, # +8, +12
+                         reloc_offset, reloc_count, # +16, +20
+                         symbols_offset, symbols_count, # +24, +28 
+                         bss_offset, align_up(bss_length, 8), # + 32 +36 BSS length
+                         0, # crs +40
+                         0, # +44 total size 
+                         entry_point, # +48 entry point offset
+                         0,  # +52 reserved
+                         0,  # +56 reserved
+                         0,  # +60 reserved
+    ) 
+    if args.verbose:
+        # Print header as 4-byte chunks in hex
+        header_words = [header[i:i+4] for i in range(0, len(header), 4)]
+        print("[*] Header:")
+        for idx, word in enumerate(header_words):
+            print(f"  [{idx:2}] {word.hex()}")
 
+    total_size = 0
     with open(args.output_bin, "wb") as f:
         f.write(header)
+
+        if f.tell() != HEADER_SIZE:
+            print(f"[E] Header size mismatch: expected {HEADER_SIZE} bytes, got {f.tell()} bytes")
+            return -1
+
         f.write(description)
         f.write(b'\x00' * description_padding)
         f.write(bin_data)
-        f.write(b'\x00' * bss_size) if bss_size > 0 else None 
-        f.write(b'\x00' * bin_size_padded) 
-        f.write(relocation_table)
+        f.write(b'\x00' * bin_size_padding)
+        f.write(b''.join(relocs))
+        f.write(b''.join(symbols))
+        total_size = f.tell()
+        if args.verbose:
+            print(f"[*] Written header, description, binary, relocations and symbols to {args.output_bin}. Total size: {total_size} bytes") 
 
+    if args.verbose:
+        print(f"[+] Output bin: {args.output_bin}")
+        print("[*] Processing completed successfully.")
+        print(f"[*] Header size: {HEADER_SIZE} bytes")
+        print(f"[*] Description size: {descriprion_size} bytes (padded to {description_fixed_size} bytes)")
+        print(f"[*] Binary size: {bin_size} bytes (padded to {fixed_bin_size} bytes)")
+        print(f"[*] Relocations size: {reloc_count} bytes")
+        print(f"[*] Symbols size: {symbols_count} bytes")
+    
     with open(args.output_bin, "r+b") as f:
-        output_data = f.read()
-        data_to_crc = output_data[HEADER_SIZE + description_fixed_size:]
-        print(f"[*] Calculating CRC32 for data starting from offset {HEADER_SIZE + description_fixed_size}; len = {len(data_to_crc)}...")
-        crc32 = zlib.crc32(data_to_crc) & 0xFFFFFFFF
-        print(f"[*] Calculated CRC32: {crc32:#010x}")
-        f.seek(12)
-        f.write(struct.pack("<I", crc32))
 
-    print(f"Header + description + relocation table added. Found {relocation_count} relocations. Total size: {HEADER_SIZE + description_fixed_size + fixed_bin_size + len(relocation_table)} bytes. Padded size: {bin_size_padded} bytes.")
-    print(f"Output binary written to: {args.output_bin}")
-    print(f"Entry point offset: {entry_offset} bytes (after header and description)")
+        f.seek(44)
+        f.write(struct.pack("<I", total_size))
+        
+        f.seek(0)
+        data = f.read()
+        
+        crc32 = zlib.crc32(data) & 0xFFFFFFFF
+        
+        f.seek(40)
+        f.write(struct.pack("<I", crc32))
+        if args.verbose:
+            print(f"[*] Calculated CRC32: {crc32:#010x}, total size: {len(data)} bytes")
 
 if __name__ == "__main__":
     main()
