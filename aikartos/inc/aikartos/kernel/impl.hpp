@@ -130,6 +130,7 @@ namespace aikartos::kernel {
 			}
 #	ifdef DEBUG
 			tcb.push<std::uint32_t>(0xDEADBEEF); // deadbeef
+			tcb.push<std::uint32_t>(0xDEADBEEF); // deadbeef
 #	endif
 			tcb.push<std::uint32_t>(0xFA000000); // padding
 			tcb.push<std::uint32_t>(0xFB000000); // FPSCR

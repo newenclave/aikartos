@@ -15,7 +15,6 @@
  * Limitations:
  * - All allocation sizes are rounded up to the next aligned bucket size.
  * - Coalescing occurs only when physically adjacent blocks are free.
- * - Requires external storage for bucket index table and heap memory region.
  *
  *  Created on: May 22, 2025
  *      Author: newenclave
@@ -24,7 +23,7 @@
 
 #pragma once 
 
-#include <string.h>
+#include <cstring>
 #include "aikartos/utils/align_up.hpp"
 
 namespace aikartos::memory::allocator::tlsf {
@@ -195,14 +194,14 @@ namespace aikartos::memory::allocator::tlsf {
 
 			const std::size_t fixed_requested_size = align_up(new_requested_size + block_header::aligned_size());
 			if (auto in_place_block = try_expand_in_place(state, block, fixed_requested_size)) {
-				memmove(in_place_block->payload_ptr(), ptr, std::min(block->available(), new_requested_size));
+				std::memmove(in_place_block->payload_ptr(), ptr, std::min(block->available(), new_requested_size));
 				block->mark_free();
 				split_block(state, in_place_block, new_requested_size);
 
 				return in_place_block->payload_ptr();
 			}
 			else if(auto new_ptr = allocate(state, new_requested_size)) {
-				memmove(new_ptr, ptr, std::min(block->available(), new_requested_size));
+				std::memmove(new_ptr, ptr, std::min(block->available(), new_requested_size));
 				free(state, ptr);
 				return new_ptr;
 			}

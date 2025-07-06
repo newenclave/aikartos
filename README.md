@@ -27,6 +27,7 @@ The project is written in **C++20**.
 - [License](#license)
 - [Getting Started](#getting-started)
 - [Build Requirements](#build-requirements)
+- [Modules](#modules)
 
 ---
 
@@ -164,3 +165,6 @@ This project uses **CMake** as its build system and can be built with **Ninja**,
 
 
 
+## Modules 
+
+See [Modules and Bundle Format](modules/modules.md) for details on how modules work in AikaRTOS.
