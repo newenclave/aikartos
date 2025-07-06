@@ -114,6 +114,10 @@ if (is_module(base)) {
 }
 ```
 
+## Example
+
+[test module](modules/test) A simple module example
+
 ---
 
 ## Toolchain
