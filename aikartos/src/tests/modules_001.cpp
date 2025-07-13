@@ -103,8 +103,6 @@ namespace tests {
 
 		}
 
-
-
 		kernel::launch(10);
 		PANIC("Should not be here");
 	}

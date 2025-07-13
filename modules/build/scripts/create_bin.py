@@ -87,11 +87,12 @@ def parse_relocations(elf_path):
 
         # get bss section
         bss_sec = elf.get_section_by_name('.bss')
-        if not bss_sec:
+        if bss_sec:
+            bss_length = bss_sec['sh_size']
+            bss_start = bss_sec['sh_addr']
+            print(f"[+] BSS section found: {bss_sec.name} (size: {bss_length}, start: {bss_start})")
+        else:
             print("[!] No .bss section found")
-        bss_length = bss_sec['sh_size']
-        bss_start = bss_sec['sh_addr']
-        print(f"[+] BSS section found: {bss_sec.name} (size: {bss_length}, start: {bss_start})")
 
         # parse symbols
         symtab_sec = elf.get_section_by_name('.symtab')

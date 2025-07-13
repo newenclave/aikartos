@@ -1,5 +1,7 @@
 set(MODULE_NAME test)
 
+include(${CMAKE_SOURCE_DIR}/cmake/aika_create_module.cmake)
+
 set(SOURCES
     src/module.cpp
 )
@@ -68,41 +70,11 @@ set(ELF_OUTPUT ${CMAKE_BINARY_DIR}/build/${MODULE_NAME}.elf)
 set(BIN_RAW ${CMAKE_BINARY_DIR}/build/${MODULE_NAME}.bin)
 set(RESULT_OUTPUT ${CMAKE_BINARY_DIR}/build/${MODULE_NAME}.aika)
 
-add_custom_command(
-    OUTPUT ${BIN_RAW}
-    COMMAND ${CMAKE_OBJCOPY}
-        -O binary
-        -j .text -j .rodata -j .data -j .bss
-        ${ELF_OUTPUT} ${BIN_RAW}
-    DEPENDS ${MODULE_NAME}_elf
-    COMMENT "[+] Generating raw binary for ${MODULE_NAME}"
+aika_create_module(
+    ${MODULE_NAME}
+    ${ELF_OUTPUT}
+    ${BIN_RAW}
+    ${RESULT_OUTPUT}
+    ${MODULE_DESCRIPTION}
 )
 
-set(PYTHON_SCRIPT ${CMAKE_SOURCE_DIR}/build/scripts/create_bin.py)
-
-if(MODULE_DESCRIPTION)
-    set(MODULE_DESCRIPTION_ARG "-d \"${MODULE_DESCRIPTION}\"")
-else()
-    set(MODULE_DESCRIPTION_ARG "")
-endif()
-
-add_custom_command(
-    OUTPUT ${RESULT_OUTPUT}
-    COMMAND python ${PYTHON_SCRIPT}
-        -e ${ELF_OUTPUT}
-        -o ${RESULT_OUTPUT}
-        -i ${BIN_RAW}
-        ${MODULE_DESCRIPTION_ARG}
-        --verbose
-    DEPENDS ${BIN_RAW}
-    COMMENT "[+] Creating AIKA binary for ${MODULE_NAME}"
-)
-
-add_custom_target(${MODULE_NAME}_bin ALL DEPENDS ${RESULT_OUTPUT})
-
-add_custom_command(
-    TARGET ${MODULE_NAME}_bin POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${MODULES_OUTPUT_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${RESULT_OUTPUT} ${MODULES_OUTPUT_DIR}/${MODULE_NAME}.aika
-    COMMENT "[+] Copying ${MODULE_NAME}.bin to ${MODULES_OUTPUT_DIR}"
-)
