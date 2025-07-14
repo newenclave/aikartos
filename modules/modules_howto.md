@@ -69,7 +69,7 @@ To produce a valid relocatable module, compile the code with the following prope
 ### Compiler example (GCC):
 
 ```sh
-g++ -ffreestanding -nostdlib -fno-exceptions -fno-rtti \
+arm-none-eabi-g++ -ffreestanding -nostdlib -fno-exceptions -fno-rtti \
     -Wall -Wextra \
     -mcpu=cortex-m4 -mthumb \
     -c module.cpp -o module.o
