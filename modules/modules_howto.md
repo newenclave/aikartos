@@ -1,6 +1,6 @@
-# Loadable Modules in RTOS: A Practical Guide Using AIKaRTOS
+# Loadable Modules in RTOS: A Practical Guide Using AikaRTOS
 
-This document provides a comprehensive overview of how loadable modules can be implemented in a real-time operating system (RTOS), using **AIKaRTOS** as a working example.
+This document provides a comprehensive overview of how loadable modules can be implemented in a real-time operating system (RTOS), using **AikaRTOS** as a working example.
 
 You'll learn how to:
 
@@ -19,7 +19,7 @@ You'll learn how to:
 
    * Compiler & linker options
    * Linker script for modules
-3. [Extracting Binary with ](#3-extracting-binary-with-objcopy)[`objcopy`](#3-extracting-binary-with-objcopy)
+3. [Extracting a raw binary](#3-extracting-a-raw-binary)
 4. [Parsing the ELF File](#4-parsing-the-elf-file)
 
    * Getting sections, symbol table, relocations
@@ -114,26 +114,9 @@ Presence of `.rel.*` sections confirms that relocation information has been pres
 
 If the module does not reference any external symbols or perform operations that require relocation (such as calling functions outside the module), the `.rel.*` sections may be absent. This is normal for simple examples that contain only local logic.
 
-### Extracting a raw binary
+### Example with relocations
 
-To convert the ELF to a flat binary format, use the following command:
-
-```sh
-arm-none-eabi-objcopy -O binary \
-  -j .text -j .rodata -j .data -j .bss \
-  module.elf module.bin
-```
-
-This extracts only the relevant sections needed for execution. The `.bss` section is included for size alignment purposes; its content is assumed to be zero-initialized at runtime.
-
-After compilation and binary extraction, the result is a small binary file. For example:
-
-* ELF size: \~5 KB
-* BIN size: \~62 bytes
-
-### Example with relocation
-
-To trigger relocation table generation, the module must reference an external symbol. Example:
+To trigger relocation table generation, the module must reference an internal symbol. Example:
 
 ```cpp
 int call(const char *val) {
@@ -144,7 +127,7 @@ int call(const char *val) {
 }
 
 extern "C" int module_entry(void *param) {
-    const char *const_string = "This is string for the relocation";
+    const char *const_string = "This is a string for the relocation";
     return call(const_string);
 }
 ```
@@ -166,6 +149,24 @@ OFFSET   TYPE              VALUE
 0000003c R_ARM_ABS32       .text
 ```
 
+## 3. Extracting a raw binary
+
+To convert the ELF to a flat binary format, use the following command:
+
+```sh
+arm-none-eabi-objcopy -O binary \
+  -j .text -j .rodata -j .data -j .bss \
+  module.elf module.bin
+```
+
+This extracts only the relevant sections needed for execution. The `.bss` section is included for size alignment purposes; its content is assumed to be zero-initialized at runtime.
+
+After compilation and binary extraction, the result is a small binary file. For example:
+
+* ELF size: \~5 KB
+* BIN size: \~62 bytes
+
+
 ## 4. Parsing the ELF File
 
 Parsing the ELF file is required to extract metadata not available in the raw binary. This includes:
@@ -176,7 +177,7 @@ Parsing the ELF file is required to extract metadata not available in the raw bi
 * Symbol table
 * `.bss` size and location
 
-This step is implementation-specific. In AIKaRTOS, a Python script (`create_bin.py`) performs this task using [pyelftools](https://github.com/eliben/pyelftools). Alternatively, parsing can be done manually using the [ELF specification](https://refspecs.linuxfoundation.org/elf/elf.pdf).
+This step is implementation-specific. In AikaRTOS, a Python script ([`create_bin.py`](build/scripts/create_bin.py)) performs this task using [pyelftools](https://github.com/eliben/pyelftools). Alternatively, parsing can be done manually using the [ELF specification](https://refspecs.linuxfoundation.org/elf/elf.pdf).
 
 The output of the parsing stage is used to build a module package that contains:
 
@@ -214,7 +215,7 @@ The result is a single binary blob, suitable for flashing or loading at runtime.
 
 ## 6. Memory Mapping Modules in the RTOS
 
-In order to store and access modules from flash memory, a separate memory region must be defined in the RTOS linker script.
+In order to store and access modules from flash memory, a separate memory region can be defined in the RTOS linker script.
 
 ### Linker layout example (RTOS linker script)
 
@@ -239,6 +240,8 @@ PROVIDE(_modules_end   = ORIGIN(MODULE) + LENGTH(MODULE));
 ```
 
 This reserves a block of flash starting at `0x08060000` where modules can be written and later loaded from.
+
+> You can also put the binary on an SD card or wherever you want. The goal is to make it accessible to the RTOS as a block of bytes.  
 
 ## 7. Flashing to the Device
 
