@@ -2,8 +2,7 @@
 
 This document provides a comprehensive overview of how loadable modules can be implemented in a real-time operating system (RTOS), using **AikaRTOS** as a working example.
 
-You'll learn how to:
-
+Overview:
 * Write and compile standalone modules
 * Link them correctly for runtime loading
 * Package them with relocation info
