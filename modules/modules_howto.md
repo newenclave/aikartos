@@ -259,9 +259,8 @@ The `module.bin` file may be a raw binary extracted via `objcopy`, or it may be 
 
 ## 8. Loading and Relocating at Runtime
 
----
 
-Once the module binary is located in flash or copied into RAM, it must be loaded and relocated before use.
+Once the module binary is located in flash, it should be loaded and relocated before use.
 
 The typical steps:
 
@@ -286,6 +285,7 @@ using entry_fn_t = int(*)(void*);
 entry_fn_t entry = reinterpret_cast<entry_fn_t>(dst + entry_offset);
 entry(api_struct);
 ```
+> It's also possible to use the binary directly from the flash, but remember about the relocations.
 
 ### ARM Thumb-2 Relocation Info
 
