@@ -42,6 +42,15 @@ pub struct AikaApi {
     fpu: [usize; 2],
 }
 
+fn rust_call(api: &mut AikaApi) {
+    unsafe {
+        if let Some(write_fn) = api.device.uart_write {
+            let msg = b"\r\nHello from rust_call!\r\n\0";
+            write_fn(msg.as_ptr(), msg.len());
+        }
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn module_entry(api: *mut AikaApi) -> i32 {
     unsafe {
@@ -49,6 +58,8 @@ pub extern "C" fn module_entry(api: *mut AikaApi) -> i32 {
             let msg = b"\r\nHello from Rust module!\r\n\0";
             write_fn(msg.as_ptr(), msg.len());
         }
+
+        rust_call(&mut *api);
 
         if let Some(sleep_fn) = (*api).this_task.sleep {
             loop {
