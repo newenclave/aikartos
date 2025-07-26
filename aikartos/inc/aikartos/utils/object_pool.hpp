@@ -13,8 +13,16 @@
 #include <cstdint>
 
 namespace aikartos::utils {
-	template <typename T, std::size_t MaximumObjects, std::size_t DataAlign = 8>
+	template<typename T, std::size_t MaximumObjects, std::size_t DataAlign = 8>
 	class object_pool {
+
+		T* at(std::size_t idx) noexcept {
+			return std::launder(reinterpret_cast<T*>(data + idx * sizeof(T)));
+		}
+
+		const T* at(std::size_t idx) const noexcept {
+			return std::launder(reinterpret_cast<const T*>(data + idx * sizeof(T)));
+		}
 
 	public:
 
@@ -22,16 +30,16 @@ namespace aikartos::utils {
 		constexpr static std::size_t data_align = DataAlign;
 		constexpr static std::size_t maximum_objects = MaximumObjects;
 		constexpr static std::size_t object_size = sizeof(element_type);
-		using object_array = element_type[maximum_objects];
+		using object_array = std::byte[maximum_objects * sizeof(element_type)];
 
-		using object_ptr = element_type *;
+		using object_ptr = element_type*;
 
-		template <typename ...Args>
-		object_ptr alloc(Args&& ...args) {
+		template<typename ...Args>
+		object_ptr alloc(Args &&...args) {
 			auto free_slot = find_free_slot();
 			if (free_slot < maximum_objects) {
 				allowed_objects_.set(free_slot);
-				auto ptr = static_cast<void *>(&data[free_slot]);
+				auto ptr = static_cast<void*>(at(free_slot));
 				return new (ptr) element_type(std::forward<Args>(args)...);
 			} else {
 				PANIC("No free slots!");
@@ -39,18 +47,18 @@ namespace aikartos::utils {
 			return nullptr;
 		}
 
-		void free(element_type* ptr) {
+		void free(element_type *ptr) {
 			const auto address = reinterpret_cast<std::uintptr_t>(ptr);
-			const auto begin = reinterpret_cast<std::uintptr_t>(&data[0]);
-			const auto end = reinterpret_cast<std::uintptr_t>(&data[maximum_objects]);
+			const auto begin = reinterpret_cast<std::uintptr_t>(at(0));
+			const auto end = reinterpret_cast<std::uintptr_t>(at(maximum_objects));
 			if ((address < end) && (address >= begin)) {
 				const auto position = (address - begin);
 				const auto slot = (position / object_size);
-	#ifdef DEBUG
+#ifdef DEBUG
 				ASSERT((position % object_size) == 0, "Bad position...");
 				ASSERT(allowed_objects_.test(slot), "Object is not allocated");
-	#endif
-				if(allowed_objects_.test(slot)) {
+#endif
+				if (allowed_objects_.test(slot)) {
 					allowed_objects_.clear(slot);
 					ptr->~T();
 				}
