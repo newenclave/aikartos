@@ -225,7 +225,7 @@ namespace aikartos::modules {
 
 		void apply_reallocs() {
 			auto* hdr = get_header();
-			std::uintptr_t relocated_res = 0;
+			//std::uintptr_t relocated_res = 0;
 			for (std::size_t i = 0; i < hdr->relocs.size; ++i) {
 				auto *reloc = get_relocation(i);
 				auto *symbol = get_symbol(reloc->symbol_idx);
@@ -242,7 +242,7 @@ namespace aikartos::modules {
 					symbol->type == 3 // STT_SECTION
 						? *reinterpret_cast<std::uint32_t*>(reloc_addr) += symbol_value
 						: *reinterpret_cast<std::uint32_t*>(reloc_addr) = symbol_value;
-					relocated_res = static_cast<std::uintptr_t>(*reinterpret_cast<std::uint32_t*>(reloc_addr));
+					//relocated_res = static_cast<std::uintptr_t>(*reinterpret_cast<std::uint32_t*>(reloc_addr));
 					break;
 				case relocation_type::R_ARM_THM_CALL:
 					apply_thm_call_reloc(reloc_addr, symbol_value);
