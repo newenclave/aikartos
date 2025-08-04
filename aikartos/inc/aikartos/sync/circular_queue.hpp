@@ -15,42 +15,33 @@
 #include "aikartos/sync/policies/mutex_policy.hpp"
 #include "aikartos/sync/spin_lock.hpp"
 #include "aikartos/sync/lock_guarg.hpp"
+#include "aikartos/utils/circular_deque.hpp"
 
 namespace aikartos::sync {
 	template <typename T, std::size_t QueueSize, sync::policies::MutexPolicy MutexType = sync::spin_lock<>>
-		requires std::default_initializable<T>
 	class circular_queue {
 	public:
 		using mutex_type = MutexType;
 		using element_type = T;
 		constexpr static std::size_t queue_size = QueueSize + 1;
+		using contailer_type = utils::circular_deque<element_type, queue_size + 1>;
 
 		bool try_push(element_type value) {
 			sync::lock_guard<mutex_type> l(lock_);
-			const auto next_head = (head_ + 1) % queue_size;
-			if (next_head == tail_) {
-				return false;
-			}
-			items_[head_] = std::move(value);
-			head_ = next_head;
-			return true;
+			return queue_.emplace_back(std::move(value));
 		}
 
 		std::optional<element_type> try_get(std::size_t id) const {
-			if(id <= size()) {
-				return {items_[(tail_ + id) % queue_size] };
+			sync::lock_guard<mutex_type> l(lock_);
+			if(id < size()) {
+				return { queue_[id] };
 			}
 			return {};
 		}
 
 		std::optional<element_type> try_pop() {
 			sync::lock_guard<mutex_type> l(lock_);
-			if (head_ == tail_) {
-				return {};
-			}
-			element_type value = std::move(items_[tail_]);
-			tail_ = (tail_ + 1) % queue_size;
-			return { value };
+			return queue_.pop_front();
 		}
 
 		bool active() {
@@ -62,28 +53,28 @@ namespace aikartos::sync {
 		}
 
 		std::size_t size() const {
-			return (head_ + queue_size - tail_) % queue_size;
+			sync::lock_guard<mutex_type> l(lock_);
+			return queue_.size();
 		}
 
 		bool empty() const {
-			return 0 == size();
+			sync::lock_guard<mutex_type> l(lock_);
+			return queue_.empty();
 		}
 
 		bool full() const {
-			return ((head_ + 1) % queue_size) == tail_;
+			sync::lock_guard<mutex_type> l(lock_);
+			return queue_.full();
 		}
 
 		void clear() {
 			sync::lock_guard<mutex_type> l(lock_);
-			head_ = 0;
-			tail_ = 0;
+			queue_.clear();
 		}
 
 	private:
-		std::array<element_type, queue_size> items_;
-		std::size_t head_ = 0;
-		std::size_t tail_ = 0;
-		mutex_type lock_;
+		contailer_type queue_;
+		mutable mutex_type lock_;
 		std::atomic<bool> active_ = true;
 	};
 }

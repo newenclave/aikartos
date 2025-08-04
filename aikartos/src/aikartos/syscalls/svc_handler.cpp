@@ -50,10 +50,10 @@ extern "C" void svc_dispatch(std::uint32_t *stack_frame) {
 }
 
 extern "C" __attribute__((naked)) void SVC_Handler(void) {
-	__asm volatile ("TST 	lr, #4");  // select PSP or MSP stack
-	__asm volatile ("ITE 	eq");
-	__asm volatile ("MRSEQ 	r0, msp");
-	__asm volatile ("MRSNE 	r0, psp");
-	__asm volatile ("B 		svc_dispatch");
+	__asm volatile ("TST    lr, #4");  // select PSP or MSP stack
+	__asm volatile ("ITE    eq");
+	__asm volatile ("MRSEQ  r0, msp");
+	__asm volatile ("MRSNE  r0, psp");
+	__asm volatile ("B      svc_dispatch");
 }
 

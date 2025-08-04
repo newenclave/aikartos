@@ -87,8 +87,8 @@ namespace {
 		right,
 	};
 
-	using position_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN>;
-	using changes_buffer = sync::circular_queue<change_info, MAXIMUM_BODY_LEN>;
+	using position_buffer = sync::circular_queue<position, MAXIMUM_BODY_LEN, sync::policies::no_mutex>;
+	using changes_buffer = sync::circular_queue<change_info, MAXIMUM_BODY_LEN, sync::policies::no_mutex>;
 
 	struct console {
 		static void set_position(std::size_t x, std::size_t y) {
