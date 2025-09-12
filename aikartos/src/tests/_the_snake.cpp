@@ -30,6 +30,7 @@
 #include "aikartos/device/uart.hpp"
 #include "aikartos/rnd/xorshift32.hpp"
 
+#include "aikartos/memory/mpu.hpp"
 #include "tests.hpp"
 
 #ifdef ENABLE_TEST_the_snake_
@@ -477,6 +478,7 @@ namespace tests {
 		using config = kernel::config;
 		namespace sch_ns = sch::coop_preemptive;
 		//using flags = sch_ns::config_flags;
+		memory::mpu::enable(false, false);
 		kernel::init<sch_ns::scheduler, config>();
 		device::uart::init_rxtx(false);
 
